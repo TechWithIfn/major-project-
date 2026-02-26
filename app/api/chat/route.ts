@@ -5,7 +5,7 @@ import { generateLLMResponse } from '@/lib/llm-handler'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { message, context } = body
+    const { message, classFilter, subjectFilter, difficulty } = body
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
@@ -15,10 +15,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Process with RAG engine
-    const ragResult = ragEngine.processQuery(message)
+    const ragResult = ragEngine.processQuery(
+      message,
+      typeof classFilter === 'number' ? classFilter : undefined,
+      typeof subjectFilter === 'string' && subjectFilter.trim() !== '' ? subjectFilter : undefined
+    )
 
     // Generate LLM response
-    const llmResponse = await generateLLMResponse(message, ragResult.context)
+    const llmResponse = await generateLLMResponse(
+      difficulty
+        ? `${message}\n\nRespond in ${difficulty} level for NCERT student understanding.`
+        : message,
+      ragResult.context
+    )
 
     return NextResponse.json({
       response: llmResponse.content,
@@ -27,6 +36,7 @@ export async function POST(request: NextRequest) {
         title: source.title,
         class: source.class,
         subject: source.subject,
+        keyPoints: source.keyPoints,
       })),
       context: ragResult.context,
       timestamp: new Date().toISOString(),

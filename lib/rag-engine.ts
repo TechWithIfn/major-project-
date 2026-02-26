@@ -72,39 +72,49 @@ export class RAGEngine {
    */
   private calculateRelevance(query: string, topic: NCERTTopic): number {
     const queryLower = query.toLowerCase().trim()
-    const queryWords = queryLower.split(/\s+/).filter((w) => w.length > 1)
+    // Filter out common question words for better matching
+    const stopWords = ['what', 'is', 'are', 'the', 'a', 'an', 'how', 'why', 'when', 'where', 'which', 'tell', 'me', 'about', 'explain', 'define']
+    const queryWords = queryLower
+      .split(/\s+/)
+      .filter((w) => w.length > 1 && !stopWords.includes(w))
     let score = 0
 
     const titleLower = topic.title.toLowerCase()
     const contentLower = topic.content.toLowerCase()
     const keyPointsText = topic.keyPoints.join(' ').toLowerCase()
+    const topicText = (topic.title + ' ' + topic.content + ' ' + topic.keyPoints.join(' ')).toLowerCase()
 
     // Exact title match (highest weight)
     if (titleLower === queryLower) score += 100
     else if (titleLower.includes(queryLower)) score += 50
 
-    // Phrase in content (e.g. "role of xylem")
-    if (queryLower.length > 4 && contentLower.includes(queryLower)) score += 40
-    if (queryLower.length > 4 && keyPointsText.includes(queryLower)) score += 35
+    // Check for meaningful words in query (after filtering)
+    const cleanQuery = queryWords.join(' ')
+    if (cleanQuery.length > 0) {
+      if (titleLower.includes(cleanQuery)) score += 80
+      if (contentLower.includes(cleanQuery)) score += 40
+      if (keyPointsText.includes(cleanQuery)) score += 35
+    }
 
-    // Title word matches
+    // Title word matches (high priority)
     for (const word of queryWords) {
-      if (word.length > 2 && titleLower.includes(word)) score += 15
+      if (word.length > 2) {
+        if (titleLower.includes(word)) score += 25
+      }
     }
 
     // Content and key points: word matches
     for (const word of queryWords) {
       if (word.length <= 2) continue
-      if (contentLower.includes(word)) score += 8
-      if (topic.keyPoints.some((kp) => kp.toLowerCase().includes(word))) score += 12
+      if (contentLower.includes(word)) score += 12
+      if (topic.keyPoints.some((kp) => kp.toLowerCase().includes(word))) score += 15
     }
 
-    // Related-term boost: if query mentions "xylem", boost topic that contains xylem/phloem/transport
+    // Related-term boost: if query mentions known terms, boost relevant topics
     for (const [term, related] of Object.entries(RELATED_TERMS)) {
       if (!queryLower.includes(term)) continue
-      const topicText = (topic.title + ' ' + topic.content + ' ' + topic.keyPoints.join(' ')).toLowerCase()
       const matchCount = related.filter((r) => topicText.includes(r)).length
-      if (matchCount > 0) score += 10 + matchCount * 5
+      if (matchCount > 0) score += 30 + matchCount * 10
     }
 
     // Word frequency in content (cap per word)
@@ -112,7 +122,7 @@ export class RAGEngine {
     for (const word of queryWords) {
       if (word.length > 3) {
         const occurrences = contentWords.filter((w) => w.includes(word)).length
-        score += Math.min(occurrences, 5) * 2
+        score += Math.min(occurrences, 5) * 3
       }
     }
 

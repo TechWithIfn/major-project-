@@ -130,13 +130,49 @@ async function callLLMAPI(userQuery: string, context: string): Promise<string> {
 }
 
 /**
+ * Call the local Python FastAPI backend
+ */
+async function callLocalPythonAI(userQuery: string): Promise<string> {
+  try {
+    const localBackendUrl = process.env.LOCAL_BACKEND_URL ?? 'http://localhost:5000/ask'
+    const response = await fetch(localBackendUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: userQuery, voice: false }),
+    })
+
+    if (response.ok) {
+      const data = await response.json() as { answer: string }
+      return data.answer
+    }
+    throw new Error('Local AI error')
+  } catch (error) {
+    throw new Error('Local backend unreachable')
+  }
+}
+
+/**
  * Generate LLM response with fallback strategy
+ * Order: Local Python AI -> OpenAI API -> Heuristic Fallback
  */
 export async function generateLLMResponse(
-  userQuery: string, 
+  userQuery: string,
   context: string
 ): Promise<LLMResponse> {
-  // Try API first when OPENAI_API_KEY is set
+  // 1. Try Local Python AI first (Offline/Edge Primary)
+  try {
+    const content = await callLocalPythonAI(userQuery)
+    return {
+      content,
+      model: 'local-phi3-fastapi',
+      mode: 'api',
+      tokensUsed: 0
+    }
+  } catch (localErr) {
+    console.log('Local AI not available, trying cloud...', localErr)
+  }
+
+  // 2. Try OpenAI API as secondary
   try {
     const content = await callLLMAPI(userQuery, context)
     return {
@@ -146,7 +182,7 @@ export async function generateLLMResponse(
       tokensUsed: Math.ceil(content.split(/\s+/).length * 1.3)
     }
   } catch {
-    // Fallback to mock response
+    // 3. Fallback to local heuristic (Offline/Edge Recovery)
     const content = generateMockResponse(userQuery, context)
     return {
       content,

@@ -1,7 +1,5 @@
-'use client'
-
-import { HomePage } from '@/components/home-page'
+import { redirect } from 'next/navigation'
 
 export default function Page() {
-  return <HomePage />
+  redirect('/dashboard')
 }

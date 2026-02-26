@@ -16,8 +16,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ragEngine } from '@/lib/rag-engine'
-import { generateLLMResponse } from '@/lib/llm-handler'
+import { addBookmark } from '@/lib/student/storage'
 import { Loader2, MessageSquare, History, Trash2 } from 'lucide-react'
 
 const GREETING_MESSAGE: Message = {
@@ -41,6 +40,8 @@ interface ChatContainerProps {
   onBack?: () => void
 }
 
+const SESSIONS_STORAGE_KEY = 'shiksha:chat-sessions'
+
 export function ChatContainer({ initialClass, initialSubject, onBack }: ChatContainerProps) {
   const [messages, setMessages] = useState<Message[]>([
     { ...GREETING_MESSAGE, id: uuidv4() },
@@ -58,6 +59,30 @@ export function ChatContainer({ initialClass, initialSubject, onBack }: ChatCont
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const stored = window.localStorage.getItem(SESSIONS_STORAGE_KEY)
+    if (!stored) return
+
+    try {
+      const parsed = JSON.parse(stored) as ChatSession[]
+      if (!Array.isArray(parsed)) return
+      const normalized = parsed.map((session) => ({
+        ...session,
+        timestamp: new Date(session.timestamp),
+        messages: session.messages.map((msg) => ({ ...msg, timestamp: new Date(msg.timestamp) })),
+      }))
+      setChatSessions(normalized)
+    } catch {
+      setChatSessions([])
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(chatSessions))
+  }, [chatSessions])
+
   const handleSendMessage = async (userInput: string) => {
     const userMessage: Message = {
       id: uuidv4(),
@@ -69,12 +94,34 @@ export function ChatContainer({ initialClass, initialSubject, onBack }: ChatCont
     setIsLoading(true)
 
     try {
-      const classFilter = selectedClass ?? undefined
-      const subjectFilter = selectedSubject ?? undefined
-      const ragResult = ragEngine.processQuery(userInput, classFilter, subjectFilter)
-      const llmResponse = await generateLLMResponse(userInput, ragResult.context)
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userInput,
+          classFilter: selectedClass,
+          subjectFilter: selectedSubject,
+          difficulty,
+        }),
+      })
 
-      const firstSource = ragResult.sources[0]
+      if (!response.ok) {
+        const data = (await response.json()) as { error?: string }
+        throw new Error(data.error ?? 'Chat request failed')
+      }
+
+      const data = (await response.json()) as {
+        response: string
+        sources: Array<{
+          id: string
+          title: string
+          class: number
+          subject: string
+          keyPoints?: string[]
+        }>
+      }
+
+      const firstSource = data.sources[0]
       const title =
         firstSource != null
           ? `${firstSource.title} – Class ${firstSource.class} – ${firstSource.subject}`
@@ -83,11 +130,11 @@ export function ChatContainer({ initialClass, initialSubject, onBack }: ChatCont
       const assistantMessage: Message = {
         id: uuidv4(),
         role: 'assistant',
-        content: llmResponse.content,
+        content: data.response,
         timestamp: new Date(),
         title,
-        sources: ragResult.sources.map((s) => s.title),
-        keyPoints: [...new Set(ragResult.sources.flatMap((s) => s.keyPoints))],
+        sources: data.sources.map((s) => s.title),
+        keyPoints: [...new Set(data.sources.flatMap((s) => s.keyPoints ?? []))],
         examples: [],
       }
       const updatedMessages = [...messages, userMessage, assistantMessage]
@@ -220,9 +267,8 @@ export function ChatContainer({ initialClass, initialSubject, onBack }: ChatCont
                             loadChatSession(session)
                           }
                         }}
-                        className={`group relative flex flex-col gap-1 rounded-lg border p-3 pr-9 text-left transition-colors hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring ${
-                          currentSessionId === session.id ? 'border-primary bg-muted/50' : 'border-border'
-                        }`}
+                        className={`group relative flex flex-col gap-1 rounded-lg border p-3 pr-9 text-left transition-colors hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring ${currentSessionId === session.id ? 'border-primary bg-muted/50' : 'border-border'
+                          }`}
                       >
                         <p className="text-sm font-medium text-foreground truncate">
                           {session.title}
@@ -249,20 +295,31 @@ export function ChatContainer({ initialClass, initialSubject, onBack }: ChatCont
         }
       />
 
-      <main id="main-content" className="flex-1 overflow-y-auto overflow-x-hidden" tabIndex={-1} aria-label="Chat messages">
-        <div className="mx-auto max-w-3xl px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
+      <main id="main-content" className="flex-1 overflow-y-auto overflow-x-hidden relative" tabIndex={-1} aria-label="Chat messages">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.05),transparent_50%)] pointer-events-none" />
+        <div className="mx-auto max-w-4xl px-4 py-8 space-y-8">
           {messages.map((msg) =>
             msg.role === 'user' ? (
-              <div key={msg.id} className="flex justify-end w-full max-w-3xl ml-auto">
-                <Card className="max-w-[90%] sm:max-w-[85%] p-3 bg-primary text-primary-foreground border-0 break-words">
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                </Card>
+              <div key={msg.id} className="flex justify-end w-full animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="max-w-[85%] sm:max-w-[75%] px-5 py-3.5 grad-primary text-white rounded-2xl rounded-tr-none shadow-soft border-0 break-words font-medium text-[15px] leading-relaxed">
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                </div>
               </div>
             ) : (
               <AssistantAnswerBubble
                 key={msg.id}
                 message={msg}
                 onQuickAction={handleQuickAction}
+                onBookmark={() => {
+                  addBookmark({
+                    id: uuidv4(),
+                    title: msg.title ?? 'Chat Answer',
+                    content: msg.content,
+                    source: msg.sources?.join(', '),
+                    createdAt: new Date().toISOString(),
+                    type: 'chat',
+                  })
+                }}
               />
             )
           )}

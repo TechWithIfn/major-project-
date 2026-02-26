@@ -1,0 +1,138 @@
+[
+    {
+        "content": "Fractions and Decimals\n\nFractions represent parts of a whole. A fraction is written as a/b where a is the numerator and b is the denominator (b \u2260 0). Types of fractions: proper (numerator < denominator), improper (numerator \u2265 denominator), mixed (whole + fraction). Decimals are another way to write fractions with denominators 10, 100, 1000, etc. Conversion between fractions and decimals is important for comparison and operations.",
+        "metadata": {
+            "source": "NCERT Class 6 Mathematics",
+            "page": 1,
+            "id": "ncert-class6-math-fractions"
+        }
+    },
+    {
+        "content": "Components of Food\n\nFood contains nutrients that our body needs: carbohydrates (energy), proteins (growth and repair), fats (energy storage), vitamins and minerals (protection and regulation), roughage (digestion), and water. A balanced diet includes all these in the right amounts. Deficiency diseases result from lack of specific nutrients (e.g. scurvy \u2013 vitamin C, rickets \u2013 vitamin D).",
+        "metadata": {
+            "source": "NCERT Class 6 Science",
+            "page": 1,
+            "id": "ncert-class6-science-components"
+        }
+    },
+    {
+        "content": "Integers\n\nIntegers are whole numbers that can be positive, negative, or zero: ..., -2, -1, 0, 1, 2, ... Number line helps visualize integers. Rules for addition and subtraction: same sign add and keep sign; different signs subtract and take sign of larger absolute value. Multiplication and division of integers: like signs give positive, unlike signs give negative.",
+        "metadata": {
+            "source": "NCERT Class 7 Mathematics",
+            "page": 1,
+            "id": "ncert-class7-math-integers"
+        }
+    },
+    {
+        "content": "Acids, Bases and Salts\n\nAcids are sour (e.g. lemon, vinegar), turn blue litmus red. Bases are bitter and soapy, turn red litmus blue. Neutral substances do not change litmus colour. Neutralisation: acid + base \u2192 salt + water. Salts are formed when acids and bases react. pH scale (0\u201314) measures acidity or alkalinity; 7 is neutral.",
+        "metadata": {
+            "source": "NCERT Class 7 Science",
+            "page": 1,
+            "id": "ncert-class7-science-acids"
+        }
+    },
+    {
+        "content": "Quadratic Equations\n\nQuadratic Equations are polynomial equations of degree 2. A quadratic equation is of the form ax\u00b2 + bx + c = 0, where a \u2260 0. Key characteristics: The highest power of the variable is 2, Coefficients a, b, c are real numbers, 'a' is called the leading coefficient and must be non-zero. Methods to solve: 1. Factorization Method, 2. Completing the Square, 3. Quadratic Formula: x = (-b \u00b1 \u221a(b\u00b2 - 4ac)) / 2a. The discriminant (\u0394 = b\u00b2 - 4ac) determines the nature of roots: If \u0394 > 0: Two distinct real roots, If \u0394 = 0: One real root (repeated), If \u0394 < 0: No real roots (two complex roots)",
+        "metadata": {
+            "source": "NCERT Class 10 Mathematics",
+            "page": 1,
+            "id": "ncert-class10-math-quad"
+        }
+    },
+    {
+        "content": "Photosynthesis\n\nPhotosynthesis is the process by which plants, algae, and some bacteria use sunlight, water, and carbon dioxide to produce oxygen and energy in the form of glucose. Overall Equation: 6CO\u2082 + 6H\u2082O + light energy \u2192 C\u2086H\u2081\u2082O\u2086 + 6O\u2082. Two main stages: 1. Light-dependent reactions (Thylakoid membrane): Occurs in the presence of light, Splits water molecules, Produces ATP and NADPH, Releases oxygen as byproduct. 2. Light-independent reactions/Calvin Cycle (Stroma): Doesn't directly require light, Uses ATP and NADPH from light reactions, Produces glucose using CO\u2082. Importance: Primary source of oxygen in atmosphere, Converts light energy to chemical energy, Forms the base of most food chains",
+        "metadata": {
+            "source": "NCERT Class 10 Biology",
+            "page": 1,
+            "id": "ncert-class10-science-photosyn"
+        }
+    },
+    {
+        "content": "Poetry Appreciation - The Road Not Taken\n\nThe Road Not Taken by Robert Frost is one of the most famous poems in American literature. Central Theme: The poem explores themes of individual choice, divergence, and the decisions that shape our lives. The speaker encounters a fork in a yellow wood and must choose between two paths. Literary Devices: Metaphor: The roads represent life choices and paths, Symbolism: The yellow wood represents autumn, a time of change, Tone: Initially contemplative, becomes reflective, Rhyme Scheme: ABAAB in each stanza. Deeper Meaning: While often interpreted as celebrating unconventional choices, the poem is more nuanced. The speaker suggests that both paths were really about the same and that the difference lies in the telling of the story afterward. Key Lines: Two roads diverged in a yellow wood, I took the one less traveled by, And that has made all the difference",
+        "metadata": {
+            "source": "NCERT Class 9 English",
+            "page": 1,
+            "id": "ncert-class9-english-poetry"
+        }
+    },
+    {
+        "content": "French Revolution - Causes and Consequences\n\nThe French Revolution (1789-1799) fundamentally transformed French society and had global impact. Major Causes: 1. Economic Crisis: Poor harvests, inflation, heavy taxation, 2. Enlightenment Ideas: Concepts of liberty, equality, fraternity, 3. Absolute Monarchy: Excessive power concentrated in monarchy, 4. Social Inequality: Rigid class system (Estate System), 5. Debt Crisis: Government bankruptcy. Key Events: 1789: Storming of Bastille (July 14) - symbol of tyranny's fall, 1789: Declaration of Rights of Man and Citizen, 1793: Execution of King Louis XVI, Reign of Terror (1793-1794): Revolutionary tribunal executions, 1799: Rise of Napoleon Bonaparte. Consequences: End of feudalism, Rise of nationalism, Establishment of constitutional government, Spread of democratic ideals across Europe, Formation of modern nation-states",
+        "metadata": {
+            "source": "NCERT Class 9 History",
+            "page": 1,
+            "id": "ncert-class9-history-frenchrev"
+        }
+    },
+    {
+        "content": "Transport in Plants - Xylem and Phloem\n\nPlants have two types of vascular tissues for transport: xylem and phloem. Xylem: Role: Transports water and minerals from roots to leaves and other parts of the plant. Direction: Unidirectional (roots \u2192 shoots). Components: Vessels, tracheids, xylem parenchyma, xylem fibres. Mechanism: Water is pulled up by transpiration (evaporation from leaves) and root pressure. No energy expenditure by the plant for water transport; it is passive. Phloem: Role: Transports organic nutrients (e.g. sucrose, amino acids) from leaves (sites of photosynthesis) to roots, fruits, and growing parts. Direction: Bidirectional (source to sink). Components: Sieve tubes, companion cells, phloem parenchyma, phloem fibres. Mechanism: Requires energy (active transport at sieve tubes). Source: Leaves (photosynthesis). Sink: Roots, fruits, seeds. Summary: Xylem = water and minerals, roots to leaves. Phloem = food and nutrients, leaves to other parts. Together they form the vascular bundle and are essential for the survival of plants.",
+        "metadata": {
+            "source": "NCERT Class 10 Biology",
+            "page": 1,
+            "id": "ncert-class10-bio-transport"
+        }
+    },
+    {
+        "content": "Refraction of Light\n\nRefraction is the bending of light when it passes from one transparent medium to another. Laws of Refraction: 1. The incident ray, the refracted ray, and the normal at the point of incidence lie in the same plane. 2. Snell's Law: The ratio of the sine of the angle of incidence to the sine of the angle of refraction is constant for a given pair of media. n\u2081 sin i = n\u2082 sin r (where n is refractive index). Refractive Index: Refractive index of a medium = speed of light in vacuum / speed of light in the medium. When light enters a denser medium (e.g. air to glass), it bends towards the normal; when it enters a rarer medium, it bends away from the normal. Applications: Lenses (convex and concave) use refraction to form images. Mirages, twinkling of stars, and apparent depth in water are due to refraction.",
+        "metadata": {
+            "source": "NCERT Class 10 Physics",
+            "page": 1,
+            "id": "ncert-class10-physics-refraction"
+        }
+    },
+    {
+        "content": "Climate and Weather\n\nWeather and Climate are related but distinct concepts in studying Earth's atmosphere. Weather: Short-term atmospheric conditions, Changes rapidly (hourly, daily, weekly), Affects immediate environment, Measured by temperature, humidity, pressure, wind. Climate: Long-term average weather patterns (30+ years), Changes slowly over longer periods, Determined by latitude, altitude, ocean currents, Relatively stable for a region. Factors Affecting Climate: 1. Latitude: Distance from equator affects temperature, 2. Altitude: Higher elevation = cooler temperatures, 3. Ocean Currents: Warm/cold currents influence coastal regions, 4. Wind Patterns: Trade winds, monsoons affect precipitation, 5. Proximity to Water: Moderates temperature extremes, 6. Topography: Mountains affect rainfall patterns. Climate Zones: Tropical: Hot, humid, near equator, Temperate: Moderate, between tropics and poles, Polar: Cold, extreme conditions near poles, Arid: Dry, minimal precipitation",
+        "metadata": {
+            "source": "NCERT Class 8 Geography",
+            "page": 1,
+            "id": "ncert-class8-geography-climate"
+        }
+    },
+    {
+        "content": "Motion in a Plane\n\nMotion in a plane involves position, velocity, and acceleration as vectors in two dimensions. Projectile motion: an object thrown with initial velocity at an angle follows a parabolic path under gravity. Horizontal and vertical motions are independent. Key equations use components along x and y axes.",
+        "metadata": {
+            "source": "NCERT Class 11 Physics",
+            "page": 1,
+            "id": "ncert-class11-physics-motion"
+        }
+    },
+    {
+        "content": "Structure of Atom\n\nAtoms consist of a nucleus (protons and neutrons) and electrons. Atomic number (Z) = number of protons; mass number (A) = protons + neutrons. Isotopes have same Z, different A. Bohr model and quantum numbers describe electron arrangement. Electronic configuration follows Aufbau principle, Hund's rule, and Pauli exclusion principle.",
+        "metadata": {
+            "source": "NCERT Class 11 Chemistry",
+            "page": 1,
+            "id": "ncert-class11-chemistry-structure"
+        }
+    },
+    {
+        "content": "Indian Economy on the Eve of Independence\n\nAt independence (1947), India was an agrarian economy with low growth, poor infrastructure, and dependence on primary sector. Colonial policies had led to deindustrialisation and export of raw materials. Understanding this baseline helps analyse post-independence development and planning.",
+        "metadata": {
+            "source": "NCERT Class 11 Economics",
+            "page": 1,
+            "id": "ncert-class11-economics-indian"
+        }
+    },
+    {
+        "content": "Matrices\n\nA matrix is a rectangular array of numbers. Order of a matrix is m \u00d7 n (m rows, n columns). Operations: addition (same order), scalar multiplication, matrix multiplication (columns of first = rows of second). Transpose, symmetric and skew-symmetric matrices. Determinants and inverse of square matrices.",
+        "metadata": {
+            "source": "NCERT Class 12 Mathematics",
+            "page": 1,
+            "id": "ncert-class12-math-matrices"
+        }
+    },
+    {
+        "content": "Solutions\n\nSolutions are homogeneous mixtures. Concentration expressed as molarity, molality, mole fraction. Colligative properties depend on number of solute particles: lowering of vapour pressure, elevation in boiling point, depression in freezing point, osmotic pressure. Raoult's law for ideal solutions.",
+        "metadata": {
+            "source": "NCERT Class 12 Chemistry",
+            "page": 1,
+            "id": "ncert-class12-chemistry-solutions"
+        }
+    },
+    {
+        "content": "Indian Constitution - Rights and Duties\n\nThe Indian Constitution guarantees Fundamental Rights (Right to Equality, Freedom, against Exploitation, Religion, Cultural and Educational, Constitutional Remedies) and lays down Fundamental Duties for citizens. These ensure dignity, liberty, and accountability in a democracy.",
+        "metadata": {
+            "source": "NCERT Class 12 Civics",
+            "page": 1,
+            "id": "ncert-class12-civics-constitution"
+        }
+    }
+]
