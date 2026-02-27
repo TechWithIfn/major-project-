@@ -9,4 +9,8 @@
     <color name="text_secondary">#6B7280</color>
     <color name="border">#E5E7EB</color>
     <color name="white">#FFFFFF</color>
+    <color name="onboarding_card_bg">#F8FAFC</color>
+    <color name="onboarding_card_selected">#E0E7FF</color>
+    <color name="onboarding_accent">#6366F1</color>
+    <color name="onboarding_dot_inactive">#6B7280</color>
 </resources>

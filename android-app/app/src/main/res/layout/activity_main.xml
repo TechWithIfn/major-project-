@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -39,44 +40,246 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingBottom="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Dashboard"
+                            android:textColor="#FFFFFF"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:cardBackgroundColor="#1F293799"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="#99A9FF"
+                            app:strokeWidth="1dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="6dp"
+                                android:text="Offline"
+                                android:textColor="#C7D2FE"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Dashboard"
-                        android:textColor="#FFFFFF"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Quick access to tutor, quiz, summaries, and bookmarks."
+                        android:layout_marginTop="8dp"
+                        android:text="Ask, revise, and practice with your offline AI tutor."
                         android:textColor="#C7D2FE"
                         android:textSize="14sp" />
 
-                    <Button
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        app:cardBackgroundColor="#FFFFFF14"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="10dp"
+                        app:strokeColor="#66FFFFFF"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="14dp">
+
+                            <EditText
+                                android:id="@+id/aiSearchInput"
+                                android:layout_width="0dp"
+                                android:layout_height="52dp"
+                                android:layout_weight="1"
+                                android:background="#0A103066"
+                                android:hint="Search AI tutor"
+                                android:imeOptions="actionSend"
+                                android:inputType="text"
+                                android:paddingHorizontal="14dp"
+                                android:textColor="#FFFFFF"
+                                android:textColorHint="#B3C0FF" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/aiSearchButton"
+                                style="@style/Widget.Material3.Button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="52dp"
+                                android:layout_marginStart="10dp"
+                                android:minHeight="52dp"
+                                android:text="Ask"
+                                android:textAllCaps="false" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
                         android:id="@+id/openChatFromDashboard"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:text="Open AI Tutor Chat" />
+                        android:layout_height="110dp"
+                        android:layout_marginTop="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardBackgroundColor="#FFFFFF12"
+                        app:cardCornerRadius="26dp"
+                        app:cardElevation="10dp"
+                        app:strokeColor="#5CFFFFFF"
+                        app:strokeWidth="1dp">
 
-                    <Button
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="18dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="AI Tutor"
+                                android:textColor="#FFFFFF"
+                                android:textSize="19sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Get concept clarity with offline guided answers"
+                                android:textColor="#C7D2FE"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
                         android:id="@+id/openQuizFromDashboard"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Generate Quiz" />
+                        android:layout_height="110dp"
+                        android:layout_marginTop="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardBackgroundColor="#FFFFFF12"
+                        app:cardCornerRadius="26dp"
+                        app:cardElevation="10dp"
+                        app:strokeColor="#5CFFFFFF"
+                        app:strokeWidth="1dp">
 
-                    <Button
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="18dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Quiz Practice"
+                                android:textColor="#FFFFFF"
+                                android:textSize="19sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Generate quick NCERT quizzes with explanations"
+                                android:textColor="#C7D2FE"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
                         android:id="@+id/openBookmarksFromDashboard"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="View Saved Notes" />
+                        android:layout_height="110dp"
+                        android:layout_marginTop="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardBackgroundColor="#FFFFFF12"
+                        app:cardCornerRadius="26dp"
+                        app:cardElevation="10dp"
+                        app:strokeColor="#5CFFFFFF"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="18dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Saved Notes"
+                                android:textColor="#FFFFFF"
+                                android:textSize="19sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Review your highlighted answers and bookmarks"
+                                android:textColor="#C7D2FE"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/openOcrFromDashboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="110dp"
+                        android:layout_marginTop="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardBackgroundColor="#FFFFFF12"
+                        app:cardCornerRadius="26dp"
+                        app:cardElevation="10dp"
+                        app:strokeColor="#5CFFFFFF"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="18dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="OCR Scanner"
+                                android:textColor="#FFFFFF"
+                                android:textSize="19sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Scan textbook paragraphs with offline AI OCR"
+                                android:textColor="#C7D2FE"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </ScrollView>
 
@@ -87,12 +290,42 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="4dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="AI Tutor Chat"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/offline_indicator_badge_bg"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="5dp"
+                        android:text="● Offline AI"
+                        android:textColor="#C7D2FE"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
                 <ScrollView
                     android:id="@+id/chatScroll"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:padding="6dp">
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="6dp">
 
                     <LinearLayout
                         android:id="@+id/chatHistory"
@@ -105,28 +338,36 @@
                     android:id="@+id/inputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/chat_input_pill_bg"
+                    android:elevation="8dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="64dp"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
 
                     <EditText
                         android:id="@+id/questionInput"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="48dp"
                         android:layout_weight="1"
-                        android:background="#FFFFFF"
+                        android:background="@drawable/chat_text_field_bg"
                         android:hint="Ask your tutor..."
                         android:inputType="textMultiLine"
                         android:maxLines="4"
                         android:minHeight="48dp"
-                        android:padding="10dp"
-                        android:textColor="#000000" />
+                        android:paddingHorizontal="14dp"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#B3C0FF" />
 
                     <ImageButton
                         android:id="@+id/sendButton"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:layout_marginStart="8dp"
-                        android:background="#3DADC8"
+                        android:background="@drawable/chat_action_primary_bg"
                         android:contentDescription="Send"
+                        android:padding="12dp"
                         android:src="@android:drawable/ic_menu_send" />
 
                     <ImageButton
@@ -134,8 +375,9 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:layout_marginStart="8dp"
-                        android:background="#FF6B6B"
+                        android:background="@drawable/chat_action_secondary_bg"
                         android:contentDescription="Voice"
+                        android:padding="12dp"
                         android:src="@android:drawable/ic_btn_speak_now" />
                 </LinearLayout>
             </LinearLayout>
@@ -258,86 +500,526 @@
                         android:text="Save Profile" />
                 </LinearLayout>
             </ScrollView>
+
+            <FrameLayout
+                android:id="@+id/ocrScreen"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingBottom="10dp">
+
+                        <ImageButton
+                            android:id="@+id/ocrBackButton"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/nav_item_inactive_bg"
+                            android:contentDescription="Back"
+                            android:src="@android:drawable/ic_media_previous" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="10dp"
+                            android:text="AI OCR Scan"
+                            android:textColor="#FFFFFF"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ocr_offline_badge_bg"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="5dp"
+                            android:text="● Offline OCR"
+                            android:textColor="#C7D2FE"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/ocr_camera_surface_bg"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Align textbook paragraph inside the frame"
+                            android:textColor="#C7D2FE"
+                            android:textSize="13sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:background="@drawable/ocr_detected_paragraph_bg"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Detected Paragraph"
+                                android:textColor="#E0E7FF"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Photosynthesis is the process through which green plants..."
+                                android:textColor="#FFFFFF"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <ImageButton
+                            android:id="@+id/ocrShutterButton"
+                            android:layout_width="84dp"
+                            android:layout_height="84dp"
+                            android:layout_gravity="bottom|center_horizontal"
+                            android:layout_marginBottom="18dp"
+                            android:background="@drawable/ocr_shutter_button_bg"
+                            android:contentDescription="Capture textbook paragraph"
+                            android:src="@android:drawable/ic_menu_camera" />
+                    </FrameLayout>
+                </LinearLayout>
+            </FrameLayout>
         </FrameLayout>
 
         <LinearLayout
             android:id="@+id/bottomNav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/nav_pill_bg"
+            android:elevation="8dp"
             android:orientation="horizontal"
+            android:padding="6dp"
             android:weightSum="5">
 
             <Button
                 android:id="@+id/navDashboard"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="44dp"
                 android:layout_weight="1"
+                android:background="@drawable/nav_item_inactive_bg"
+                android:minHeight="44dp"
+                android:paddingHorizontal="8dp"
                 android:text="Home"
-                android:textSize="11sp" />
+                android:textAllCaps="false"
+                android:textColor="#E5E7EB"
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/navChat"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="44dp"
                 android:layout_weight="1"
+                android:background="@drawable/nav_item_inactive_bg"
+                android:minHeight="44dp"
+                android:paddingHorizontal="8dp"
                 android:text="Chat"
-                android:textSize="11sp" />
+                android:textAllCaps="false"
+                android:textColor="#E5E7EB"
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/navQuiz"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="44dp"
                 android:layout_weight="1"
+                android:background="@drawable/nav_item_inactive_bg"
+                android:minHeight="44dp"
+                android:paddingHorizontal="8dp"
                 android:text="Quiz"
-                android:textSize="11sp" />
+                android:textAllCaps="false"
+                android:textColor="#E5E7EB"
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/navBookmarks"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="44dp"
                 android:layout_weight="1"
+                android:background="@drawable/nav_item_inactive_bg"
+                android:minHeight="44dp"
+                android:paddingHorizontal="8dp"
                 android:text="Saved"
-                android:textSize="11sp" />
+                android:textAllCaps="false"
+                android:textColor="#E5E7EB"
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/navSettings"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="44dp"
                 android:layout_weight="1"
+                android:background="@drawable/nav_item_inactive_bg"
+                android:minHeight="44dp"
+                android:paddingHorizontal="8dp"
                 android:text="Settings"
-                android:textSize="11sp" />
+                android:textAllCaps="false"
+                android:textColor="#E5E7EB"
+                android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/splashOverlay"
+        android:id="@+id/onboardingContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#0F3460">
+        android:background="@drawable/splash_background"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="20dp">
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/onboardingSkipButton"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ShikshaSahayak"
-                android:textColor="#FFFFFF"
-                android:textSize="28sp"
-                android:textStyle="bold" />
+                android:layout_gravity="end"
+                android:minHeight="48dp"
+                android:text="Skip"
+                android:textAllCaps="false"
+                android:textColor="#E0E7FF" />
 
-            <TextView
+            <ViewFlipper
+                android:id="@+id/onboardingFlipper"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:animateFirstView="false">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="8dp">
+
+                    <ImageView
+                        android:layout_width="108dp"
+                        android:layout_height="108dp"
+                        android:contentDescription="ShikshaSahayak Logo"
+                        android:src="@drawable/ic_splash_logo" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:gravity="center"
+                        android:text="Learn Offline Anywhere."
+                        android:textColor="#FFFFFF"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center"
+                        android:text="Access your AI tutor without internet, anytime and anywhere."
+                        android:textColor="#C7D2FE"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="8dp">
+
+                    <ImageView
+                        android:layout_width="108dp"
+                        android:layout_height="108dp"
+                        android:contentDescription="AI Accuracy"
+                        android:src="@drawable/ic_splash_logo" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:gravity="center"
+                        android:text="NCERT Based Accurate Learning."
+                        android:textColor="#FFFFFF"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center"
+                        android:text="Get reliable explanations aligned with NCERT curriculum standards."
+                        android:textColor="#C7D2FE"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="6dp"
+                        android:paddingBottom="8dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:gravity="center"
+                            android:text="Choose Language."
+                            android:textColor="#FFFFFF"
+                            android:textSize="30sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:text="Select your preferred learning language."
+                            android:textColor="#C7D2FE"
+                            android:textSize="16sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="26dp"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/languageHindiCard"
+                                    android:layout_width="0dp"
+                                    android:layout_height="88dp"
+                                    android:layout_weight="1"
+                                    android:clickable="true"
+                                    android:contentDescription="Hindi"
+                                    android:focusable="true"
+                                    android:layout_marginEnd="8dp"
+                                    app:cardBackgroundColor="#F8FAFC"
+                                    app:cardCornerRadius="24dp"
+                                    app:cardElevation="8dp"
+                                    app:strokeColor="#00000000"
+                                    app:strokeWidth="2dp">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center"
+                                        android:text="Hindi"
+                                        android:textColor="#111827"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold" />
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/languageEnglishCard"
+                                    android:layout_width="0dp"
+                                    android:layout_height="88dp"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="8dp"
+                                    android:clickable="true"
+                                    android:contentDescription="English"
+                                    android:focusable="true"
+                                    app:cardBackgroundColor="#F8FAFC"
+                                    app:cardCornerRadius="24dp"
+                                    app:cardElevation="8dp"
+                                    app:strokeColor="#00000000"
+                                    app:strokeWidth="2dp">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center"
+                                        android:text="English"
+                                        android:textColor="#111827"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold" />
+                                </com.google.android.material.card.MaterialCardView>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="14dp"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/languageUrduCard"
+                                    android:layout_width="0dp"
+                                    android:layout_height="88dp"
+                                    android:layout_weight="1"
+                                    android:layout_marginEnd="8dp"
+                                    android:clickable="true"
+                                    android:contentDescription="Urdu"
+                                    android:focusable="true"
+                                    app:cardBackgroundColor="#F8FAFC"
+                                    app:cardCornerRadius="24dp"
+                                    app:cardElevation="8dp"
+                                    app:strokeColor="#00000000"
+                                    app:strokeWidth="2dp">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center"
+                                        android:text="Urdu"
+                                        android:textColor="#111827"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold" />
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/languageTamilCard"
+                                    android:layout_width="0dp"
+                                    android:layout_height="88dp"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="8dp"
+                                    android:clickable="true"
+                                    android:contentDescription="Tamil"
+                                    android:focusable="true"
+                                    app:cardBackgroundColor="#F8FAFC"
+                                    app:cardCornerRadius="24dp"
+                                    app:cardElevation="8dp"
+                                    app:strokeColor="#00000000"
+                                    app:strokeWidth="2dp">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center"
+                                        android:text="Tamil"
+                                        android:textColor="#111827"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold" />
+                                </com.google.android.material.card.MaterialCardView>
+                            </LinearLayout>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/languageBengaliCard"
+                                android:layout_width="match_parent"
+                                android:layout_height="88dp"
+                                android:layout_marginTop="14dp"
+                                android:clickable="true"
+                                android:contentDescription="Bengali"
+                                android:focusable="true"
+                                app:cardBackgroundColor="#F8FAFC"
+                                app:cardCornerRadius="24dp"
+                                app:cardElevation="8dp"
+                                app:strokeColor="#00000000"
+                                app:strokeWidth="2dp">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:text="Bengali"
+                                    android:textColor="#111827"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold" />
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+                    </LinearLayout>
+                </ScrollView>
+            </ViewFlipper>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="8dp"
-                android:text="Offline AI Tutor"
-                android:textColor="#C7D2FE"
-                android:textSize="14sp" />
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/onboardingDot1"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="@android:color/white" />
+
+                <View
+                    android:id="@+id/onboardingDot2"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="#6B7280" />
+
+                <View
+                    android:id="@+id/onboardingDot3"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="#6B7280" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/onboardingBackButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minHeight="52dp"
+                    android:text="Back"
+                    android:textAllCaps="false"
+                    android:visibility="gone" />
+
+                <Space
+                    android:layout_width="12dp"
+                    android:layout_height="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/onboardingNextButton"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minHeight="52dp"
+                    android:text="Next"
+                    android:textAllCaps="false" />
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 

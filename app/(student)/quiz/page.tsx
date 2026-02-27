@@ -57,63 +57,63 @@ export default function QuizPage() {
   }
 
   return (
-    <StudentShell title="Adaptive Quiz Hub" description="Challenge yourself with AI-generated MCQs mapped to the NCERT curriculum.">
-      <Card className="glass-card p-6 overflow-hidden relative">
-        <div className="relative z-10">
-          <Label htmlFor="quiz-topic" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Chapter or Concept</Label>
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-            <Input
-              id="quiz-topic"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder="e.g. Chemical Bonding, Indian Constitution"
-              className="h-12 rounded-xl bg-background/50 border-border/50 text-[15px] focus:ring-primary/20"
-            />
+    <StudentShell title="Adaptive Quiz Hub" description="Generate NCERT-style assessments in a focused research workspace.">
+      <div className="mx-auto w-full max-w-4xl space-y-6">
+        <Card className="overflow-hidden border-border/60 bg-card p-6">
+          <div>
+            <Label htmlFor="quiz-topic" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Chapter or Concept</Label>
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+              <Input
+                id="quiz-topic"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder="e.g. Chemical Bonding, Indian Constitution"
+                className="h-10 rounded-lg border-border/60 bg-background text-sm"
+              />
+              <Button
+                onClick={generateQuiz}
+                disabled={isLoading || !topic.trim()}
+                className="h-10 gap-2 rounded-lg px-6"
+              >
+                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
+                Generate Quiz
+              </Button>
+            </div>
+            {error && <p className="mt-3 text-sm font-medium text-destructive">{error}</p>}
+          </div>
+        </Card>
+
+        <Card className="overflow-hidden border-border/60 bg-card">
+          <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Practice Assessment</h2>
+            </div>
             <Button
-              onClick={generateQuiz}
-              disabled={isLoading || !topic.trim()}
-              className="h-12 rounded-xl px-8 grad-primary shadow-soft border-0 gap-2 font-bold"
+              variant="outline"
+              size="sm"
+              className="h-8 gap-2 rounded-full"
+              onClick={saveQuiz}
+              disabled={!quiz.trim()}
             >
-              {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
-              Generate Quiz
+              <Save className="h-3.5 w-3.5" />
+              Save Result
             </Button>
           </div>
-          {error && <p className="mt-3 text-sm font-semibold text-destructive animate-in fade-in slide-in-from-top-1">{error}</p>}
-        </div>
-        <div className="absolute -left-20 -bottom-20 h-40 w-40 rounded-full bg-primary/5 blur-3xl" />
-      </Card>
-
-      <Card className="mt-8 glass-card border-border/30 overflow-hidden shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border/50 bg-muted/30 px-6 py-4">
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Practice Assessment</h2>
+          <div className="p-6">
+            <Textarea
+              value={quiz}
+              onChange={(e) => setQuiz(e.target.value)}
+              rows={20}
+              className="min-h-[500px] resize-none border-0 bg-transparent p-0 text-sm leading-7 focus-visible:ring-0"
+              placeholder="Your AI-generated quiz will appear here. Answer the questions then check the key at the bottom..."
+            />
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full h-8 px-4 border-primary/20 bg-transparent text-primary hover:bg-primary/5 gap-2 font-bold"
-            onClick={saveQuiz}
-            disabled={!quiz.trim()}
-          >
-            <Save className="h-3.5 w-3.5" />
-            Save Result
-          </Button>
-        </div>
-        <div className="p-6">
-          <Textarea
-            value={quiz}
-            onChange={(e) => setQuiz(e.target.value)}
-            rows={20}
-            className="min-h-[500px] border-0 bg-transparent p-0 text-[16px] font-medium leading-relaxed resize-none focus-visible:ring-0 selection:bg-primary/10"
-            placeholder="Your AI-generated quiz will appear here. Answer the questions then check the key at the bottom..."
-          />
-        </div>
-      </Card>
+        </Card>
 
-      <p className="mt-6 text-center text-[11px] text-muted-foreground/60 font-medium italic">
-        Tip: You can edit the text directly to add your own notes before saving.
-      </p>
+        <p className="text-center text-[11px] font-medium text-muted-foreground/70">
+          Tip: You can edit the text directly to add your own notes before saving.
+        </p>
+      </div>
     </StudentShell>
   )
 }

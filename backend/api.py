@@ -1,4 +1,13 @@
 import os
+
+# --- Memory-safe defaults for local/low-RAM environments ---
+# Must be set before importing ML/Numpy-backed libraries.
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
+os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
+
 import uvicorn
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,7 +46,10 @@ config = {
     "embedding_cache": os.path.join(os.path.dirname(__file__), "models/embeddings"),
     "llm_model": "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
     "llm_dir": os.path.join(os.path.dirname(__file__), "models/llm"),
-    "use_gpu": False
+    "use_gpu": False,
+    "n_ctx": int(os.getenv("SHIKSHA_LLM_CTX", "1024")),
+    "n_threads": int(os.getenv("SHIKSHA_LLM_THREADS", "2")),
+    "retrieval_k": int(os.getenv("SHIKSHA_RETRIEVAL_K", "3"))
 }
 
 # Lazy initialization of engines

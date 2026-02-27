@@ -1,12 +1,19 @@
 package com.shiksha.sahayak
 
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,16 +33,22 @@ interface ShikshaApi {
 }
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var splashOverlay: View
+    private var isAppContentReady = false
 
     private lateinit var dashboardScreen: View
     private lateinit var chatScreen: View
     private lateinit var quizScreen: View
     private lateinit var bookmarksScreen: View
     private lateinit var settingsScreen: View
+    private lateinit var ocrScreen: View
+    private lateinit var bottomNav: View
+    private lateinit var ocrBackButton: ImageButton
+    private lateinit var ocrShutterButton: ImageButton
 
     private lateinit var chatHistory: LinearLayout
     private lateinit var chatScroll: ScrollView
+    private lateinit var aiSearchInput: EditText
+    private lateinit var aiSearchButton: MaterialButton
     private lateinit var questionInput: EditText
     private lateinit var sendButton: ImageButton
     private lateinit var voiceButton: ImageButton
@@ -56,9 +69,27 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navBookmarks: Button
     private lateinit var navSettings: Button
 
+    private lateinit var onboardingContainer: View
+    private lateinit var onboardingFlipper: ViewFlipper
+    private lateinit var onboardingSkipButton: MaterialButton
+    private lateinit var onboardingBackButton: MaterialButton
+    private lateinit var onboardingNextButton: MaterialButton
+    private lateinit var onboardingDot1: View
+    private lateinit var onboardingDot2: View
+    private lateinit var onboardingDot3: View
+
+    private lateinit var languageHindiCard: MaterialCardView
+    private lateinit var languageEnglishCard: MaterialCardView
+    private lateinit var languageUrduCard: MaterialCardView
+    private lateinit var languageTamilCard: MaterialCardView
+    private lateinit var languageBengaliCard: MaterialCardView
+
     private val bookmarks = mutableListOf<String>()
     private lateinit var progressBar: ProgressBar
     private val prefs by lazy { getSharedPreferences("shiksha_mobile", MODE_PRIVATE) }
+    private var onboardingStep = 0
+    private var selectedLanguage = "English"
+    private var appLanguage = "English"
 
     private val api: ShikshaApi by lazy {
         Retrofit.Builder()
@@ -84,19 +115,27 @@ class MainActivity : AppCompatActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { !isAppContentReady }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        splashOverlay = findViewById(R.id.splashOverlay)
         dashboardScreen = findViewById(R.id.dashboardScreen)
         chatScreen = findViewById(R.id.chatScreen)
         quizScreen = findViewById(R.id.quizScreen)
         bookmarksScreen = findViewById(R.id.bookmarksScreen)
         settingsScreen = findViewById(R.id.settingsScreen)
+        ocrScreen = findViewById(R.id.ocrScreen)
+        bottomNav = findViewById(R.id.bottomNav)
+        ocrBackButton = findViewById(R.id.ocrBackButton)
+        ocrShutterButton = findViewById(R.id.ocrShutterButton)
 
         // Bind Views
         chatScroll = findViewById(R.id.chatScroll)
         chatHistory = findViewById(R.id.chatHistory)
+        aiSearchInput = findViewById(R.id.aiSearchInput)
+        aiSearchButton = findViewById(R.id.aiSearchButton)
         questionInput = findViewById(R.id.questionInput)
         sendButton = findViewById(R.id.sendButton)
         voiceButton = findViewById(R.id.voiceButton)
@@ -117,9 +156,39 @@ class MainActivity : AppCompatActivity() {
         navBookmarks = findViewById(R.id.navBookmarks)
         navSettings = findViewById(R.id.navSettings)
 
-        findViewById<Button>(R.id.openChatFromDashboard).setOnClickListener { showScreen("chat") }
-        findViewById<Button>(R.id.openQuizFromDashboard).setOnClickListener { showScreen("quiz") }
-        findViewById<Button>(R.id.openBookmarksFromDashboard).setOnClickListener { showScreen("bookmarks") }
+        onboardingContainer = findViewById(R.id.onboardingContainer)
+        onboardingFlipper = findViewById(R.id.onboardingFlipper)
+        onboardingSkipButton = findViewById(R.id.onboardingSkipButton)
+        onboardingBackButton = findViewById(R.id.onboardingBackButton)
+        onboardingNextButton = findViewById(R.id.onboardingNextButton)
+        onboardingDot1 = findViewById(R.id.onboardingDot1)
+        onboardingDot2 = findViewById(R.id.onboardingDot2)
+        onboardingDot3 = findViewById(R.id.onboardingDot3)
+
+        languageHindiCard = findViewById(R.id.languageHindiCard)
+        languageEnglishCard = findViewById(R.id.languageEnglishCard)
+        languageUrduCard = findViewById(R.id.languageUrduCard)
+        languageTamilCard = findViewById(R.id.languageTamilCard)
+        languageBengaliCard = findViewById(R.id.languageBengaliCard)
+
+        findViewById<View>(R.id.openChatFromDashboard).setOnClickListener { showScreen("chat") }
+        findViewById<View>(R.id.openQuizFromDashboard).setOnClickListener { showScreen("quiz") }
+        findViewById<View>(R.id.openBookmarksFromDashboard).setOnClickListener { showScreen("bookmarks") }
+        findViewById<View>(R.id.openOcrFromDashboard).setOnClickListener { showScreen("ocr") }
+
+        ocrBackButton.setOnClickListener { showScreen("dashboard") }
+        ocrShutterButton.setOnClickListener {
+            Toast.makeText(this, "Paragraph captured with Offline OCR", Toast.LENGTH_SHORT).show()
+        }
+
+        aiSearchButton.setOnClickListener {
+            submitDashboardSearch()
+        }
+
+        aiSearchInput.setOnEditorActionListener { _, _, _ ->
+            submitDashboardSearch()
+            true
+        }
 
         navDashboard.setOnClickListener { showScreen("dashboard") }
         navChat.setOnClickListener { showScreen("chat") }
@@ -127,12 +196,9 @@ class MainActivity : AppCompatActivity() {
         navBookmarks.setOnClickListener { showScreen("bookmarks") }
         navSettings.setOnClickListener { showScreen("settings") }
 
-        configureProfileSettings()
+        appLanguage = prefs.getString("app_language", "English") ?: "English"
 
-        lifecycleScope.launch {
-            kotlinx.coroutines.delay(1200)
-            splashOverlay.visibility = View.GONE
-        }
+        configureProfileSettings()
         
         // Add a progress bar programmatically for better UX
         progressBar = ProgressBar(this, null, android.R.attr.progressBarStyleSmall)
@@ -159,9 +225,118 @@ class MainActivity : AppCompatActivity() {
             }
         }
         
-        addMessage("🎓", "Namaste! I am Shiksha Sahayak, your AI tutor. Ask me anything from your NCERT textbooks.", false)
+        addMessage("🎓", getLocalizedGreeting(appLanguage), false)
         showScreen("dashboard")
         renderBookmarks()
+        configureOnboarding()
+
+        findViewById<View>(R.id.rootContent).post {
+            isAppContentReady = true
+        }
+    }
+
+    private fun configureOnboarding() {
+        selectedLanguage = prefs.getString("app_language", "English") ?: "English"
+
+        languageHindiCard.setOnClickListener { selectLanguage("Hindi") }
+        languageEnglishCard.setOnClickListener { selectLanguage("English") }
+        languageUrduCard.setOnClickListener { selectLanguage("Urdu") }
+        languageTamilCard.setOnClickListener { selectLanguage("Tamil") }
+        languageBengaliCard.setOnClickListener { selectLanguage("Bengali") }
+
+        onboardingSkipButton.setOnClickListener {
+            completeOnboarding(saveAsComplete = true)
+        }
+
+        onboardingBackButton.setOnClickListener {
+            if (onboardingStep > 0) {
+                onboardingStep -= 1
+                onboardingFlipper.displayedChild = onboardingStep
+                updateOnboardingUiState()
+            }
+        }
+
+        onboardingNextButton.setOnClickListener {
+            if (onboardingStep < 2) {
+                onboardingStep += 1
+                onboardingFlipper.displayedChild = onboardingStep
+                updateOnboardingUiState()
+                return@setOnClickListener
+            }
+            completeOnboarding(saveAsComplete = true)
+        }
+
+        selectLanguage(selectedLanguage)
+
+        val alreadyCompleted = prefs.getBoolean("onboarding_completed", false)
+        if (alreadyCompleted) {
+            onboardingContainer.visibility = View.GONE
+        } else {
+            onboardingContainer.visibility = View.VISIBLE
+            onboardingStep = 0
+            onboardingFlipper.displayedChild = onboardingStep
+            updateOnboardingUiState()
+        }
+    }
+
+    private fun completeOnboarding(saveAsComplete: Boolean) {
+        prefs.edit()
+            .putBoolean("onboarding_completed", saveAsComplete)
+            .putString("app_language", selectedLanguage)
+            .apply()
+
+        appLanguage = selectedLanguage
+        chatHistory.removeAllViews()
+        addMessage("🎓", getLocalizedGreeting(appLanguage), false)
+
+        onboardingContainer.visibility = View.GONE
+        Toast.makeText(this, "Language set to $selectedLanguage", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun updateOnboardingUiState() {
+        onboardingBackButton.visibility = if (onboardingStep == 0) View.GONE else View.VISIBLE
+        onboardingSkipButton.visibility = if (onboardingStep == 2) View.INVISIBLE else View.VISIBLE
+        onboardingNextButton.text = if (onboardingStep == 2) "Get Started" else "Next"
+
+        updateDot(onboardingDot1, onboardingStep == 0)
+        updateDot(onboardingDot2, onboardingStep == 1)
+        updateDot(onboardingDot3, onboardingStep == 2)
+    }
+
+    private fun updateDot(dot: View, isActive: Boolean) {
+        val drawable = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(
+                ContextCompat.getColor(
+                    this@MainActivity,
+                    if (isActive) R.color.white else R.color.onboarding_dot_inactive
+                )
+            )
+        }
+        dot.background = drawable
+    }
+
+    private fun selectLanguage(language: String) {
+        selectedLanguage = language
+        updateLanguageCard(languageHindiCard, language == "Hindi")
+        updateLanguageCard(languageEnglishCard, language == "English")
+        updateLanguageCard(languageUrduCard, language == "Urdu")
+        updateLanguageCard(languageTamilCard, language == "Tamil")
+        updateLanguageCard(languageBengaliCard, language == "Bengali")
+    }
+
+    private fun updateLanguageCard(card: MaterialCardView, selected: Boolean) {
+        card.strokeColor = ContextCompat.getColor(
+            this,
+            if (selected) R.color.onboarding_accent else android.R.color.transparent
+        )
+        card.setCardBackgroundColor(
+            ContextCompat.getColor(
+                this,
+                if (selected) R.color.onboarding_card_selected else R.color.onboarding_card_bg
+            )
+        )
+        card.cardElevation = if (selected) 12f else 8f
     }
 
     private fun configureProfileSettings() {
@@ -186,18 +361,72 @@ class MainActivity : AppCompatActivity() {
         quizScreen.visibility = if (screen == "quiz") View.VISIBLE else View.GONE
         bookmarksScreen.visibility = if (screen == "bookmarks") View.VISIBLE else View.GONE
         settingsScreen.visibility = if (screen == "settings") View.VISIBLE else View.GONE
+        ocrScreen.visibility = if (screen == "ocr") View.VISIBLE else View.GONE
+        bottomNav.visibility = if (screen == "ocr") View.GONE else View.VISIBLE
+
+        setNavItemState(navDashboard, screen == "dashboard" || screen == "ocr")
+        setNavItemState(navChat, screen == "chat")
+        setNavItemState(navQuiz, screen == "quiz")
+        setNavItemState(navBookmarks, screen == "bookmarks")
+        setNavItemState(navSettings, screen == "settings")
+    }
+
+    private fun setNavItemState(button: Button, active: Boolean) {
+        button.setBackgroundResource(
+            if (active) R.drawable.nav_item_active_bg else R.drawable.nav_item_inactive_bg
+        )
+        button.setTextColor(
+            ContextCompat.getColor(
+                this,
+                if (active) android.R.color.white else android.R.color.darker_gray
+            )
+        )
     }
 
     private fun startVoiceInput() {
+        val languageLocale = getSpeechLocale(appLanguage)
         val intent = Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, "en-IN")
+            putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, languageLocale)
             putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, "Speak your question")
         }
         try {
             speechResultLauncher.launch(intent)
         } catch (e: Exception) {
             Toast.makeText(this, "Voice input unavailable on this device", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun submitDashboardSearch() {
+        val query = aiSearchInput.text.toString().trim()
+        if (query.isEmpty()) {
+            showScreen("chat")
+            questionInput.requestFocus()
+            return
+        }
+
+        showScreen("chat")
+        handleUserQuery(query)
+        aiSearchInput.text.clear()
+    }
+
+    private fun getSpeechLocale(language: String): String {
+        return when (language) {
+            "Hindi" -> "hi-IN"
+            "Urdu" -> "ur-PK"
+            "Tamil" -> "ta-IN"
+            "Bengali" -> "bn-IN"
+            else -> "en-IN"
+        }
+    }
+
+    private fun getLocalizedGreeting(language: String): String {
+        return when (language) {
+            "Hindi" -> "नमस्ते! मैं शिक्षा सहायक हूँ, आपका एआई ट्यूटर। अपने NCERT प्रश्न पूछें।"
+            "Urdu" -> "السلام علیکم! میں شکشا سہایک ہوں، آپ کا اے آئی ٹیوٹر۔ اپنے NCERT سوالات پوچھیں۔"
+            "Tamil" -> "வணக்கம்! நான் Shiksha Sahayak, உங்கள் AI டியூட்டர். உங்கள் NCERT கேள்விகளை கேளுங்கள்."
+            "Bengali" -> "নমস্কার! আমি শিক্ষা সহায়ক, আপনার AI টিউটর। আপনার NCERT প্রশ্ন জিজ্ঞাসা করুন।"
+            else -> "Namaste! I am Shiksha Sahayak, your AI tutor. Ask me anything from your NCERT textbooks."
         }
     }
 
@@ -213,7 +442,7 @@ class MainActivity : AppCompatActivity() {
                 val response = withContext(Dispatchers.IO) {
                     api.getAnswer(QueryRequest(query))
                 }
-                addMessage("🎓", response.answer, false)
+                addMessage("🎓", response.answer, false, response.sources?.isNotEmpty() == true)
                 addBookmark(response.answer)
             } catch (e: Exception) {
                 addMessage("❌", "Error: Brain unreachable. Ensure local backend is running on port 5000.", false)
@@ -284,24 +513,52 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addMessage(icon: String, text: String, isUser: Boolean) {
+    private fun addMessage(icon: String, text: String, isUser: Boolean, showSourceBadge: Boolean = false) {
+        val messageContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = if (isUser) Gravity.END else Gravity.START
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(8, 8, 8, 8)
+            }
+        }
+
         val bubble = TextView(this).apply {
             this.text = "$icon $text"
             this.setPadding(24, 16, 24, 16)
-            this.textSize = 16f
-            this.setTextColor(android.graphics.Color.WHITE)
-            
-            val params = LinearLayout.LayoutParams(
+            this.textSize = 15f
+            this.setLineSpacing(0f, 1.15f)
+            this.setTextColor(if (isUser) Color.WHITE else Color.parseColor("#1E293B"))
+            this.maxWidth = resources.displayMetrics.widthPixels - 180
+            this.layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(16, 8, 16, 8)
-                gravity = if (isUser) android.view.Gravity.END else android.view.Gravity.START
-            }
-            this.layoutParams = params
+            )
             this.setBackgroundResource(if (isUser) R.drawable.user_bubble else R.drawable.ai_bubble)
         }
-        chatHistory.addView(bubble)
+
+        messageContainer.addView(bubble)
+
+        if (!isUser && showSourceBadge) {
+            val sourceBadge = TextView(this).apply {
+                text = "NCERT Source"
+                textSize = 11f
+                setTextColor(Color.parseColor("#4338CA"))
+                setPadding(14, 6, 14, 6)
+                setBackgroundResource(R.drawable.ncert_source_badge_bg)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topMargin = 6
+                }
+            }
+            messageContainer.addView(sourceBadge)
+        }
+
+        chatHistory.addView(messageContainer)
         
         // Auto-scroll to bottom
         chatScroll.post {

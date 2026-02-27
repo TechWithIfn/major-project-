@@ -16,7 +16,7 @@ export function Navbar({ showBackButton = false }: NavbarProps) {
   return (
     <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-20 safe-top" aria-label="Main navigation">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
-        <Link href="/" className="flex items-center gap-2 group min-h-[44px] min-w-[44px] items-center sm:min-w-0 sm:min-h-0" aria-label="ShikshaSahayak home">
+        <Link href="/" className="flex items-center gap-2 group min-h-[44px] min-w-[44px] sm:min-w-0 sm:min-h-0" aria-label="ShikshaSahayak home">
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center group-hover:shadow-lg transition-all shrink-0">
             <BookMarked className="h-5 w-5 text-white" aria-hidden />
           </div>

@@ -3,6 +3,12 @@ from pathlib import Path
 from typing import List, Dict, Optional
 import time
 
+# Keep BLAS/OMP thread count low for stability on constrained machines.
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
+
 # --- ML & RAG Imports (Delayed) ---
 # Heavy imports moved inside class to speed up API boot
 from langchain_core.documents import Document
@@ -29,7 +35,8 @@ class ShikshaRAGPipeline:
         self.embeddings = HuggingFaceEmbeddings(
             model_name="sentence-transformers/all-MiniLM-L6-v2",
             cache_folder=str(self.embedding_cache),
-            encode_kwargs={'normalize_embeddings': True}
+            model_kwargs={"device": "cpu"},
+            encode_kwargs={'normalize_embeddings': True, 'batch_size': 8}
         )
 
         
@@ -40,7 +47,8 @@ class ShikshaRAGPipeline:
         print(f"🧠 Loading Edge LLM ({config['llm_model']})...")
         self.llm = EdgeLLMEngine(
             model_path=str(self.model_dir / config['llm_model']),
-            n_ctx=2048,
+            n_ctx=int(config.get("n_ctx", 1024)),
+            n_threads=int(config.get("n_threads", 2)),
             use_gpu=config.get("use_gpu", False)
         )
 
@@ -104,7 +112,7 @@ Student Question: {query}
         start_time = time.time()
         
         # 1. Retrieve
-        docs = self.retrieve(query)
+        docs = self.retrieve(query, k=int(self.config.get("retrieval_k", 3)))
         if not docs:
             return {"answer": "Error: Knowledge base unavailable.", "sources": []}
             

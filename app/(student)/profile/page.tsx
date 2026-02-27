@@ -39,11 +39,11 @@ export default function ProfilePage() {
 
   return (
     <StudentShell title="Academic Profile" description="Tailor your AI tutor's behavior by setting your class and subject preferences.">
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-7 sm:gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          <Card className="glass-card p-6 sm:p-8">
-            <h2 className="text-xl font-bold tracking-tight text-foreground">Personal Details</h2>
-            <p className="mt-1 text-sm text-muted-foreground/80 font-medium">These settings help ShikshaSahayak customize explanations specifically for your grade.</p>
+          <Card className="glass-card premium-glass p-6 sm:p-8">
+            <h2 className="type-premium-title text-xl text-foreground">Personal Details</h2>
+            <p className="type-premium-body mt-1 text-sm text-muted-foreground/80 font-medium">These settings help ShikshaSahayak customize explanations specifically for your grade.</p>
 
             <div className="mt-8 space-y-6">
               <div className="space-y-2.5">
@@ -104,22 +104,22 @@ export default function ProfilePage() {
             </div>
           </Card>
 
-          <Card className="border-dashed bg-muted/20 p-6 rounded-2xl">
+          <Card className="border-dashed premium-glass p-6 rounded-2xl">
             <div className="flex gap-4">
               <div className="h-10 w-10 shrink-0 rounded-full grad-primary flex items-center justify-center shadow-glow">
                 <span className="text-white font-bold text-xs">AI</span>
               </div>
               <div>
-                <h4 className="text-sm font-bold text-foreground">Smart Personalization</h4>
-                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">Your data is stored locally. ShikshaSahayak uses your class level to fetch specific NCERT curriculum data from its offline vector database.</p>
+                <h4 className="type-premium-title text-sm text-foreground">Smart Personalization</h4>
+                <p className="type-premium-body mt-1 text-xs text-muted-foreground">Your data is stored locally. ShikshaSahayak uses your class level to fetch specific NCERT curriculum data from its offline vector database.</p>
               </div>
             </div>
           </Card>
         </div>
 
         <div className="space-y-6">
-          <Card className="glass-card p-6 border-primary/20">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-primary">Learning Stats</h3>
+          <Card className="glass-card premium-glass p-6 border-primary/20">
+            <h3 className="type-premium-title text-sm uppercase tracking-widest text-primary">Learning Stats</h3>
             <div className="mt-4 space-y-4">
               {[
                 { label: 'Saved Notes', value: '12', color: 'bg-primary' },
@@ -134,9 +134,9 @@ export default function ProfilePage() {
             </div>
           </Card>
 
-          <Card className="p-6 bg-accent/5 border-accent/10">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-accent">Student Feedback</h3>
-            <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed italic">"The AI tutor makes complex Science concepts very easy to digest. I love how it maps everything to NCERT."</p>
+          <Card className="premium-glass p-6 bg-accent/5 border-accent/10">
+            <h3 className="type-premium-title text-xs uppercase tracking-widest text-accent">Student Feedback</h3>
+            <p className="type-premium-body mt-3 text-[11px] text-muted-foreground italic">&quot;The AI tutor makes complex Science concepts very easy to digest. I love how it maps everything to NCERT.&quot;</p>
           </Card>
         </div>
       </div>

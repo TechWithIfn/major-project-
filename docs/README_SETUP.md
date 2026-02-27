@@ -6,9 +6,14 @@ This project is now configured with an offline RAG pipeline and a mobile-ready b
 
 ### 1. Start the Backend
 ```bash
-python backend/app.py
+python backend/api.py
 ```
 This will start the AI brain on `http://localhost:5000`.
+
+If your system has limited RAM, use this Windows PowerShell command instead:
+```powershell
+$env:OPENBLAS_NUM_THREADS="1"; $env:OMP_NUM_THREADS="1"; $env:MKL_NUM_THREADS="1"; $env:SHIKSHA_LLM_CTX="1024"; $env:SHIKSHA_LLM_THREADS="2"; python backend/api.py
+```
 
 ### 2. Add Content
 - Place your NCERT PDF textbooks in `data/ncert_pdfs/`.

@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-02-28T00:00:00.0000000+00:00",
+  "disabledExtensions": [
+    "blackboxapp.blackbox",
+    "blackboxapp.blackboxagent",
+    "github.copilot-chat",
+    "github.vscode-github-actions",
+    "mechatroner.rainbow-csv",
+    "ms-azuretools.vscode-containers",
+    "ms-python.debugpy",
+    "ms-python.vscode-python-envs",
+    "ms-vscode.cmake-tools",
+    "ms-vscode.cpp-devtools",
+    "ms-vscode.cpptools",
+    "ms-vscode.cpptools-extension-pack",
+    "ms-vscode.cpptools-themes",
+    "ms-vscode.powershell",
+    "ritwickdey.liveserver",
+    "sarthikbhat.json-server",
+    "tomoki1207.pdf"
+  ]
+}

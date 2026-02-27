@@ -4,7 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:lowmem": "node --max-old-space-size=1024 ./node_modules/next/dist/bin/next dev",
     "dev:turbo": "next dev --turbo",
+    "dev:all:lowmem": "powershell -ExecutionPolicy Bypass -File ./scripts/start-dev-lowmem.ps1",
+    "extensions:enforce": "powershell -ExecutionPolicy Bypass -File ./scripts/disable-non-allowlist-extensions.ps1",
+    "extensions:enforce:dry": "powershell -ExecutionPolicy Bypass -File ./scripts/disable-non-allowlist-extensions.ps1 -DryRun",
+    "extensions:rollback": "powershell -ExecutionPolicy Bypass -File ./scripts/reenable-disabled-extensions.ps1",
+    "extensions:rollback:dry": "powershell -ExecutionPolicy Bypass -File ./scripts/reenable-disabled-extensions.ps1 -DryRun",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings 0"

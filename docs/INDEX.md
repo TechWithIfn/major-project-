@@ -8,6 +8,7 @@ Welcome to ShikshaSahayak! This index helps you navigate all the documentation a
 - **Full Guide**: [README.md](./README.md) - Comprehensive documentation
 - **Configuration**: [CONFIG_GUIDE.md](./CONFIG_GUIDE.md) - Setup LLM and customize
 - **Project Overview**: [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) - Architecture and features
+- **Premium UI/UX System**: [UI_UX_SYSTEM_SHIKSHASAHAYAK.md](./UI_UX_SYSTEM_SHIKSHASAHAYAK.md) - Complete mobile/web design blueprint
 - **Validation**: [VALIDATION_CHECKLIST.md](./VALIDATION_CHECKLIST.md) - What's been built
 
 ## What is ShikshaSahayak?

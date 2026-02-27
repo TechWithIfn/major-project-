@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="token_indigo_primary">#6366F1</color>
+    <color name="token_indigo_deep">#4F46E5</color>
+    <color name="token_surface_dark_indigo">#0A1030</color>
+    <color name="token_supporting_text">#C7D2FE</color>
+    <color name="token_glass_border">#66FFFFFF</color>
+
+    <dimen name="token_radius_sm">12dp</dimen>
+    <dimen name="token_radius_md">20dp</dimen>
+    <dimen name="token_radius_lg">24dp</dimen>
+
+    <dimen name="token_touch_min">44dp</dimen>
+    <dimen name="token_spacing_1">8dp</dimen>
+    <dimen name="token_spacing_2">12dp</dimen>
+    <dimen name="token_spacing_3">16dp</dimen>
+</resources>

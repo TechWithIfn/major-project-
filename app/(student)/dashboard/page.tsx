@@ -11,15 +11,15 @@ import { cn } from '@/lib/utils'
 export default function DashboardPage() {
   return (
     <StudentShell title="Dashboard" description="Welcome back! Your personal NCERT learning workspace is ready.">
-      <div className="grid gap-6 lg:grid-cols-4 lg:grid-rows-2">
-        <Card className="glass-card overflow-hidden p-8 lg:col-span-3 lg:row-span-1 relative">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-4 lg:grid-rows-2">
+        <Card className="glass-card premium-indigo-hero gemini-grid-surface overflow-hidden p-8 lg:col-span-3 lg:row-span-1 relative">
           <div className="relative z-10">
             <Badge variant="outline" className="mb-4 border-primary/30 bg-primary/10 text-primary px-3 py-1 font-bold text-[10px] uppercase tracking-widest">
               <Sparkles className="mr-1.5 h-3.5 w-3.5" />
               Intelligence Engine Active
             </Badge>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground">Welcome back, Scholar!</h2>
-            <p className="mt-3 max-w-xl text-base text-muted-foreground leading-relaxed font-medium">
+            <h2 className="type-premium-title text-3xl text-white">Welcome back, Scholar!</h2>
+            <p className="type-premium-body mt-3 max-w-xl text-base text-indigo-100/90 font-medium">
               Your offline AI tutor has analyzed <span className="text-primary font-bold">14 new NCERT chapters</span> since your last session. Ready to master a new concept today?
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
@@ -40,10 +40,10 @@ export default function DashboardPage() {
           <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
         </Card>
 
-        <Card className="glass-card p-6 lg:col-span-1 lg:row-span-2 flex flex-col">
+        <Card className="glass-card premium-glass p-6 lg:col-span-1 lg:row-span-2 flex flex-col">
           <div className="flex items-center gap-2 mb-6 text-primary">
             <LayoutDashboard className="h-5 w-5" />
-            <h3 className="font-bold tracking-tight uppercase text-xs tracking-widest">Navigation</h3>
+            <h3 className="font-bold uppercase text-xs tracking-widest">Navigation</h3>
           </div>
           <div className="space-y-4 flex-1">
             {[
@@ -78,7 +78,7 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        <Card className="glass-card p-8 lg:col-span-3 lg:row-span-1 border-primary/10">
+        <Card className="glass-card premium-glass p-8 lg:col-span-3 lg:row-span-1 border-primary/10">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
               <ClipboardList className="h-4 w-4" />
@@ -108,19 +108,19 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="mt-16">
-        <div className="mb-8 flex items-end justify-between border-b border-border/50 pb-4">
+      <div className="mt-14 sm:mt-16">
+        <div className="mb-7 sm:mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between border-b border-border/50 pb-4">
           <div className="space-y-1">
-            <h3 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-3">
+            <h3 className="type-premium-title text-2xl text-foreground flex items-center gap-3">
               <BookOpen className="h-6 w-6 text-primary" />
               Curriculum Explorer
             </h3>
             <p className="text-sm text-muted-foreground font-medium">Deep-dive into specific NCERT subjects with AI guidance.</p>
           </div>
-          <Button variant="ghost" className="text-primary font-bold hover:bg-primary/5 rounded-xl">View All Subjects</Button>
+          <Button variant="ghost" className="hidden sm:inline-flex text-primary font-bold hover:bg-primary/5 rounded-xl">View All Subjects</Button>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {NCERT_SUBJECTS.map((subject, idx) => {
             const colors = [
               'hover:border-blue-500/40 hover:shadow-blue-500/10',
@@ -145,8 +145,8 @@ export default function DashboardPage() {
                     <Badge variant="outline" className="text-[9px] font-black uppercase opacity-60">NCERT</Badge>
                   </div>
                   <div>
-                    <p className="text-xl font-black tracking-tight group-hover:text-primary transition-colors">{subject}</p>
-                    <p className="mt-1.5 text-xs text-muted-foreground font-medium italic">Master complex theories instantly</p>
+                    <p className="text-clamp-2 text-lg sm:text-xl font-black tracking-tight leading-tight group-hover:text-primary transition-colors">{subject}</p>
+                    <p className="mt-1.5 text-[11px] sm:text-xs text-muted-foreground font-medium italic">Master complex theories instantly</p>
                   </div>
                   <div className="flex items-center gap-2 pt-2 text-[10px] font-bold uppercase tracking-widest text-primary/80 opacity-0 group-hover:opacity-100 transition-all duration-300">
                     <Sparkles className="h-3 w-3" />

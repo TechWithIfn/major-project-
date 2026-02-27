@@ -8,9 +8,11 @@ from pathlib import Path
 try:
     from vosk import Model, KaldiRecognizer
     import pyaudio
-except ImportError:
-    print("⚠️ Vosk or PyAudio not found. Offline STT will be disabled.")
+except Exception as e:
+    print(f"⚠️ Vosk/PyAudio unavailable ({e}). Offline STT will be disabled.")
     Model = None
+    KaldiRecognizer = None
+    pyaudio = None
 
 class ShikshaSpeech:
     """

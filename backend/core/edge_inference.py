@@ -3,6 +3,11 @@ import sys
 from pathlib import Path
 from typing import Optional, List, Iterator
 
+
+def _safe_default_threads() -> int:
+    cpu_count = os.cpu_count() or 2
+    return max(1, min(2, cpu_count))
+
 # Use llama-cpp-python for high-performance GGUF inference
 # Highly optimized for mobile/CPU/Windows/Mac
 try:
@@ -25,8 +30,8 @@ class EdgeLLMEngine:
     def __init__(
         self, 
         model_path: str, 
-        n_ctx: int = 2048, 
-        n_threads: int = 4,
+        n_ctx: int = 1024, 
+        n_threads: int = _safe_default_threads(),
         use_gpu: bool = False
     ):
         self.model_path = Path(model_path)

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Send, Loader2, Mic, MicOff, Paperclip, Sparkles } from 'lucide-react'
+import { Send, Loader2, Mic, MicOff } from 'lucide-react'
 import { useVoiceInput } from '@/hooks/use-voice-input'
 import { cn } from '@/lib/utils'
 
@@ -51,32 +51,32 @@ export function ChatInputArea({
   }
 
   return (
-    <div className="sticky bottom-0 z-20 w-full bg-gradient-to-t from-background via-background/95 to-transparent pb-6 pt-10 px-4">
+    <div className="sticky bottom-0 z-20 w-full border-t border-border/50 bg-background/95 px-3 pb-4 pt-3 sm:px-4">
       <div className="mx-auto max-w-4xl">
         <div
           className={cn(
-            "relative flex flex-col transition-all duration-300 rounded-3xl border bg-card/80 backdrop-blur-2xl shadow-soft",
-            isFocused ? "border-primary/50 shadow-glow ring-4 ring-primary/5 scale-[1.01]" : "border-border/50",
+            "relative flex flex-col rounded-2xl border bg-card transition-all duration-200",
+            isFocused ? "border-primary/40 ring-2 ring-primary/10" : "border-border/60",
             (isLoading || disabled) && "opacity-80"
           )}
         >
           {voiceError && (
-            <div className="absolute -top-8 left-4 animate-in fade-in slide-in-from-bottom-2">
-              <p className="text-[10px] font-bold text-destructive flex items-center gap-1 uppercase tracking-wider">
-                <span className="h-1 w-1 rounded-full bg-destructive animate-pulse" />
+            <div className="absolute -top-7 left-2 animate-in fade-in slide-in-from-bottom-2">
+              <p className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wide text-destructive">
+                <span className="h-1 w-1 animate-pulse rounded-full bg-destructive" />
                 {voiceError}
               </p>
             </div>
           )}
 
-          <div className="flex items-end gap-2 p-3">
+          <div className="flex items-end gap-2 p-2.5">
             <Button
               type="button"
               variant="ghost"
               size="icon"
               className={cn(
-                "h-10 w-10 shrink-0 rounded-2xl transition-colors",
-                isListening ? "bg-destructive/10 text-destructive hover:bg-destructive/20" : "hover:bg-muted"
+                "h-9 w-9 shrink-0 rounded-xl transition-colors",
+                isListening ? "bg-destructive/10 text-destructive hover:bg-destructive/20" : "hover:bg-muted/60"
               )}
               onClick={startListening}
               disabled={isLoading || disabled}
@@ -97,7 +97,7 @@ export function ChatInputArea({
               onBlur={() => setIsFocused(false)}
               placeholder={placeholder}
               disabled={isLoading || disabled}
-              className="min-h-[2.5rem] max-h-48 w-full resize-none border-0 bg-transparent py-3 focus-visible:ring-0 text-[15px] font-medium placeholder:text-muted-foreground/60"
+              className="min-h-[2.5rem] max-h-48 w-full resize-none border-0 bg-transparent py-2 text-sm leading-6 placeholder:text-muted-foreground/70 focus-visible:ring-0"
               rows={1}
             />
 
@@ -106,8 +106,8 @@ export function ChatInputArea({
               disabled={!input.trim() || isLoading || disabled}
               size="icon"
               className={cn(
-                "h-10 w-10 shrink-0 rounded-2xl transition-all shadow-soft",
-                input.trim() ? "grad-primary text-white scale-100" : "bg-muted text-muted-foreground scale-95"
+                "h-9 w-9 shrink-0 rounded-xl transition-all",
+                input.trim() ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
               )}
             >
               {isLoading ? (
@@ -118,18 +118,15 @@ export function ChatInputArea({
             </Button>
           </div>
 
-          <div className="flex items-center justify-between px-4 pb-2 border-t border-border/10">
+          <div className="flex items-center justify-between border-t border-border/30 px-3 pb-2 pt-1.5">
             <div className="flex items-center gap-3">
-              <span className="text-[10px] font-bold text-muted-foreground/50 tracking-widest uppercase">NCERT AI Assistant</span>
+              <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Research Mode · NCERT</span>
             </div>
-            <div className="flex items-center gap-1.5 opacity-40">
-              <Sparkles className="h-3 w-3 text-primary" />
-              <span className="text-[10px] font-bold text-primary">Llama 3.1 Powered</span>
-            </div>
+            <span className="text-[10px] font-medium text-muted-foreground">Enter ↵ send · Shift+Enter newline</span>
           </div>
         </div>
-        <p className="mt-2 text-center text-[10px] text-muted-foreground/60 font-medium">
-          ShikshaSahayak can provide detailed explanations for all NCERT subjects from Class 6 to 12.
+        <p className="mt-2 text-center text-[10px] font-medium text-muted-foreground/70">
+          Source-grounded tutor for NCERT Classes 6–12.
         </p>
       </div>
     </div>

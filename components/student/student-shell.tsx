@@ -80,9 +80,9 @@ export function StudentShell({ title, description, children }: StudentShellProps
                         "h-10 transition-all duration-200",
                         active ? "bg-primary/10 text-primary hover:bg-primary/15" : "hover:bg-muted"
                       )}>
-                        <Link href={item.href} className="flex items-center gap-3">
+                        <Link href={item.href} className="flex min-w-0 items-center gap-3">
                           <Icon className={cn("h-4.5 w-4.5", active ? "text-primary" : "text-muted-foreground")} />
-                          <span className="font-medium">{item.label}</span>
+                          <span className="truncate font-medium">{item.label}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -98,7 +98,7 @@ export function StudentShell({ title, description, children }: StudentShellProps
             <div className="rounded-xl bg-primary/5 p-4 border border-primary/10">
               <p className="text-xs font-semibold text-primary">Pro Tip</p>
               <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
-                Use "Summary Mode" for quick chapter revisions before exams.
+                Use &quot;Summary Mode&quot; for quick chapter revisions before exams.
               </p>
             </div>
           </div>
@@ -113,17 +113,17 @@ export function StudentShell({ title, description, children }: StudentShellProps
         </SidebarFooter>
       </Sidebar>
 
-      <SidebarInset className="bg-background grad-surface">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/40 bg-background/80 px-6 backdrop-blur-xl">
-          <div className="flex items-center gap-4">
+      <SidebarInset className="bg-background grad-surface min-w-0">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/40 bg-background/80 px-3 sm:px-6 backdrop-blur-xl">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <SidebarTrigger className="hover:bg-muted" />
-            <div className="h-4 w-[1px] bg-border" />
-            <div className="flex flex-col">
-              <h1 className="text-sm font-bold tracking-tight sm:text-base">{title}</h1>
-              <p className="hidden text-[11px] text-muted-foreground font-medium sm:block">{description}</p>
+            <div className="hidden h-4 w-[1px] bg-border sm:block" />
+            <div className="flex min-w-0 flex-col">
+              <h1 className="type-premium-title truncate text-sm sm:text-base">{title}</h1>
+              <p className="type-premium-body hidden text-[11px] text-muted-foreground font-medium sm:block">{description}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <Button asChild variant="outline" size="sm" className="hidden rounded-full px-4 h-9 font-medium sm:inline-flex border-primary/20 bg-transparent text-primary hover:bg-primary/5 hover:text-primary">
               <Link href="/chat" className="flex items-center gap-2">
                 <Brain className="h-3.5 w-3.5" />
@@ -136,8 +136,8 @@ export function StudentShell({ title, description, children }: StudentShellProps
           </div>
         </header>
 
-        <main id="main-content" className="relative flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-8">
-          <div className="mx-auto max-w-6xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <main id="main-content" className="relative flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto min-w-0 max-w-6xl space-y-7 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {children}
           </div>
         </main>

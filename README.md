@@ -79,6 +79,17 @@ pnpm install
 
 # Run development server
 pnpm dev
+
+# Low-memory mode (Windows, starts backend + frontend)
+pnpm dev:all:lowmem
+
+# Extension allowlist enforcement (dry-run first)
+pnpm extensions:enforce:dry
+pnpm extensions:enforce
+
+# Roll back previously disabled extensions (dry-run first)
+pnpm extensions:rollback:dry
+pnpm extensions:rollback
 ```
 
 Visit `http://localhost:3000` to start using ShikshaSahayak.
