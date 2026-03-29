@@ -1,24 +1,48 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { CURRICULUM_DATA, getClassesAndSubjects } from '@/lib/curriculum'
+import { CURRICULUM_DATA, type NCERTTopic } from '@/lib/curriculum'
+import { loadStudyMaterials } from '@/lib/student/study-materials-db'
 import { ChevronRight, BookOpen, GraduationCap, BookMarked } from 'lucide-react'
 
 interface TopicSelectorProps {
-  onSelectTopic?: (topicId: string) => void
+  onSelectTopic?: (topic: NCERTTopic) => void
   onClose?: () => void
 }
 
 export function TopicSelector({ onSelectTopic, onClose }: TopicSelectorProps) {
   const [selectedClass, setSelectedClass] = useState<number | null>(null)
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null)
+  const [topics, setTopics] = useState<NCERTTopic[]>(CURRICULUM_DATA)
 
-  const { classes, subjects } = getClassesAndSubjects()
+  useEffect(() => {
+    let mounted = true
 
-  const filteredTopics = CURRICULUM_DATA.filter((topic) => {
+    const hydrateFromOfflineStorage = async () => {
+      const { materials } = await loadStudyMaterials()
+      if (!mounted) return
+      setTopics(materials)
+    }
+
+    void hydrateFromOfflineStorage()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const classes = useMemo(() => {
+    return [...new Set(topics.map((topic) => topic.class))].sort((a, b) => a - b)
+  }, [topics])
+
+  const subjects = useMemo(() => {
+    return [...new Set(topics.map((topic) => topic.subject))].sort((a, b) => a.localeCompare(b))
+  }, [topics])
+
+  const filteredTopics = topics.filter((topic) => {
     if (selectedClass != null && topic.class !== selectedClass) return false
     if (selectedSubject != null && topic.subject !== selectedSubject) return false
     return true
@@ -96,14 +120,14 @@ export function TopicSelector({ onSelectTopic, onClose }: TopicSelectorProps) {
                   key={topic.id}
                   className="p-3 hover:border-primary/50 hover:bg-card/90 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-ring"
                   onClick={() => {
-                    onSelectTopic?.(topic.id)
+                    onSelectTopic?.(topic)
                     onClose?.()
                   }}
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
-                      onSelectTopic?.(topic.id)
+                      onSelectTopic?.(topic)
                       onClose?.()
                     }
                   }}

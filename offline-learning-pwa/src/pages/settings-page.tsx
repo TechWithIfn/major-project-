@@ -1,5 +1,7 @@
 import { useOutletContext } from 'react-router-dom';
-import { clearAppCacheData, getBookmarks } from '../lib/storage';
+import { useNetworkStatus } from '../hooks/use-network-status';
+import { useOfflineAppOverview, useOfflineBookmarks } from '../hooks/use-offline-study';
+import { clearOfflineContentData } from '../lib/db';
 
 type LayoutContext = {
   darkMode: boolean;
@@ -8,10 +10,12 @@ type LayoutContext = {
 
 export function SettingsPage() {
   const { darkMode, setDarkMode } = useOutletContext<LayoutContext>();
-  const bookmarkCount = getBookmarks().length;
+  const { isOnline, changedAt } = useNetworkStatus();
+  const { data: overview } = useOfflineAppOverview();
+  const { data: bookmarks } = useOfflineBookmarks();
 
   const handleClearCache = async () => {
-    clearAppCacheData();
+    await clearOfflineContentData();
 
     if ('caches' in window) {
       const keys = await caches.keys();
@@ -46,7 +50,14 @@ export function SettingsPage() {
 
       <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <h3 className="font-semibold">Offline Storage Info</h3>
-        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Saved bookmarks: {bookmarkCount}</p>
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+          Offline status: {isOnline ? 'Online' : 'Offline'} (updated {new Date(changedAt).toLocaleTimeString()})
+        </p>
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Saved bookmarks: {bookmarks.length}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400">Subjects cached: {overview.subjects}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400">Chapters cached: {overview.chapters}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400">Content blocks cached: {overview.content}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400">Quiz bundles cached: {overview.quizzes}</p>
         <p className="text-sm text-slate-600 dark:text-slate-400">Service worker cache: enabled</p>
       </article>
 

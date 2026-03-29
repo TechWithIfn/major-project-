@@ -1,7 +1,5 @@
 import { ArrowLeft, Layers, Target, Trophy } from 'lucide-react'
-import Link from 'next/link'
 import { ThemeSwitcher } from '@/components/theme-switcher'
-import { NCERT_CLASSES, NCERT_SUBJECTS } from '@/lib/curriculum'
 import {
   Select,
   SelectContent,
@@ -12,6 +10,9 @@ import {
 import { Button } from '@/components/ui/button'
 
 interface ChatTopBarProps {
+  classes: number[]
+  subjects: string[]
+  offlineCacheStatus: 'loading' | 'ready' | 'fallback'
   selectedClass: number | null
   selectedSubject: string | null
   onClassChange: (value: number | null) => void
@@ -23,6 +24,9 @@ interface ChatTopBarProps {
 }
 
 export function ChatTopBar({
+  classes,
+  subjects,
+  offlineCacheStatus,
   selectedClass,
   selectedSubject,
   onClassChange,
@@ -56,7 +60,7 @@ export function ChatTopBar({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Classes</SelectItem>
-                {NCERT_CLASSES.map((c) => (
+                {classes.map((c) => (
                   <SelectItem key={c} value={String(c)}>Class {c}</SelectItem>
                 ))}
               </SelectContent>
@@ -77,7 +81,7 @@ export function ChatTopBar({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Subjects</SelectItem>
-                {NCERT_SUBJECTS.map((s) => (
+                {subjects.map((s) => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
               </SelectContent>
@@ -103,6 +107,18 @@ export function ChatTopBar({
         </div>
 
         <div className="flex items-center gap-2">
+          {offlineCacheStatus !== 'loading' && (
+            <span
+              className="hidden items-center gap-1 rounded-full border border-border/60 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground md:inline-flex"
+              aria-live="polite"
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${offlineCacheStatus === 'ready' ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                aria-hidden="true"
+              />
+              {offlineCacheStatus === 'ready' ? 'Offline cache ready' : 'Offline cache unavailable'}
+            </span>
+          )}
           {extraActions}
           <div className="mx-1 hidden h-7 w-[1px] bg-border/40 sm:block" />
           <ThemeSwitcher />

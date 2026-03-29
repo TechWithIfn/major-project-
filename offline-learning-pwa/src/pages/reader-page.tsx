@@ -1,22 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Bookmark, BookmarkCheck, CheckCircle2, RotateCcw } from 'lucide-react';
 import { ProgressBar } from '../components/ui/progress-bar';
 import { useOfflineChapterBundle } from '../hooks/use-offline-study';
-import { markChapterCompleted, saveChapterReadPosition } from '../lib/db';
-import { getBookmarks, toggleBookmark } from '../lib/storage';
+import { markChapterCompleted, saveChapterReadPosition, toggleBookmark } from '../lib/db';
 
 export function ReaderPage() {
   const { chapterId } = useParams();
   const { data: chapterBundle, isLoading, error } = useOfflineChapterBundle(chapterId);
-  const [bookmarks, setBookmarks] = useState<string[]>(() => getBookmarks());
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [resumePosition, setResumePosition] = useState(0);
   const articleRef = useRef<HTMLElement | null>(null);
   const restoredRef = useRef(false);
   const savedPositionRef = useRef(0);
-
-  const isBookmarked = useMemo(() => bookmarks.includes(chapterId ?? ''), [bookmarks, chapterId]);
 
   if (isLoading) {
     return <p className="rounded-xl bg-slate-100 p-4 text-slate-700 dark:bg-slate-900 dark:text-slate-300">Loading offline chapter content...</p>;
@@ -38,9 +35,10 @@ export function ReaderPage() {
 
     setIsCompleted(nextCompleted);
     setResumePosition(nextPosition);
+    setIsBookmarked(chapterBundle.isBookmarked);
     savedPositionRef.current = nextPosition;
     restoredRef.current = false;
-  }, [chapter.id, chapter.completed, chapterBundle.progress?.completed, chapterBundle.progress?.lastPosition]);
+  }, [chapter.id, chapter.completed, chapterBundle.progress?.completed, chapterBundle.progress?.lastPosition, chapterBundle.isBookmarked]);
 
   useEffect(() => {
     const articleElement = articleRef.current;
@@ -110,7 +108,13 @@ export function ReaderPage() {
   }, [chapter.id, isCompleted]);
 
   const handleBookmark = () => {
-    setBookmarks(toggleBookmark(chapterId));
+    if (!chapterId) {
+      return;
+    }
+
+    void toggleBookmark(chapterId).then((nextBookmarked) => {
+      setIsBookmarked(nextBookmarked);
+    });
   };
 
   const handleResumeReading = () => {

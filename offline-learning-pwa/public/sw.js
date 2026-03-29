@@ -8,7 +8,7 @@ const APP_SHELL_FILES = ['/', '/index.html', '/manifest.json', '/offline.html', 
 const STUDY_SYNC_TAG = 'learning-hub-study-sync';
 const STUDY_SYNC_URLS = ['/api/offline-study.json', '/api/offline-study', 'http://localhost:3000/api/offline-study'];
 const DB_NAME = 'learning-hub-offline-db';
-const DB_VERSION = 3;
+const DB_VERSION = 5;
 
 const ONE_DAY_SECONDS = 60 * 60 * 24;
 
@@ -154,10 +154,26 @@ function openStudyDatabase() {
         { name: 'chapterId_kind', keyPath: ['chapterId', 'kind'], options: { unique: false } },
         { name: 'updatedAt', keyPath: 'updatedAt', options: { unique: false } },
       ]);
+      ensureStore(database, transaction, 'content', 'id', [
+        { name: 'subjectId', keyPath: 'subjectId', options: { unique: false } },
+        { name: 'chapterId', keyPath: 'chapterId', options: { unique: false } },
+        { name: 'kind', keyPath: 'kind', options: { unique: false } },
+        { name: 'chapterId_kind', keyPath: ['chapterId', 'kind'], options: { unique: false } },
+        { name: 'updatedAt', keyPath: 'updatedAt', options: { unique: false } },
+      ]);
       ensureStore(database, transaction, 'quizzes', 'id', [
         { name: 'subjectId', keyPath: 'subjectId', options: { unique: false } },
         { name: 'chapterId', keyPath: 'chapterId', options: { unique: false } },
         { name: 'updatedAt', keyPath: 'updatedAt', options: { unique: false } },
+      ]);
+      ensureStore(database, transaction, 'bookmarks', 'id', [
+        { name: 'chapterId', keyPath: 'chapterId', options: { unique: false } },
+        { name: 'subjectId', keyPath: 'subjectId', options: { unique: false } },
+        { name: 'updatedAt', keyPath: 'updatedAt', options: { unique: false } },
+      ]);
+      ensureStore(database, transaction, 'chatMessages', 'id', [
+        { name: 'role', keyPath: 'role', options: { unique: false } },
+        { name: 'createdAt', keyPath: 'createdAt', options: { unique: false } },
       ]);
       ensureStore(database, transaction, 'progress', 'id', [
         { name: 'chapterId', keyPath: 'chapterId', options: { unique: false } },
@@ -246,7 +262,7 @@ async function applyStudyBundleToIndexedDb(bundle) {
   const progressByChapter = new Map(progressRows.map((progress) => [progress.chapterId, progress]));
 
   await new Promise((resolve, reject) => {
-    const transaction = database.transaction(['subjects', 'chapters', 'studyMaterials', 'quizzes', 'meta'], 'readwrite');
+    const transaction = database.transaction(['subjects', 'chapters', 'studyMaterials', 'content', 'quizzes', 'meta'], 'readwrite');
     const syncedAt = new Date().toISOString();
 
     bundle.subjects.forEach((subject) => {
@@ -262,6 +278,7 @@ async function applyStudyBundleToIndexedDb(bundle) {
 
     bundle.materials.forEach((material) => {
       transaction.objectStore('studyMaterials').put(material);
+      transaction.objectStore('content').put(material);
     });
 
     bundle.quizzes.forEach((quiz) => {
@@ -372,7 +389,14 @@ self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
     event.respondWith(
       networkFirst(event.request, HTML_CACHE_NAME, {
-        fallbackResponse: caches.match('/offline.html'),
+        fallbackResponse: (async () => {
+          const shell = await caches.match('/index.html');
+          if (shell) {
+            return shell;
+          }
+
+          return caches.match('/offline.html');
+        })(),
         maxAgeSeconds: 60 * 60,
       })
     );

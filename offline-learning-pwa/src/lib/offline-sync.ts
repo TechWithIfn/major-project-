@@ -23,13 +23,22 @@ export async function syncStudyLibraryInForeground(): Promise<boolean> {
   }
 
   try {
+    await setMetaValue('lastSyncStatus', 'syncing');
+    dispatchSyncEvent({ source: 'sync-started', syncedAt: new Date().toISOString() });
+
     const bundle = await fetchStudyBundleFromApi();
     const syncedAt = new Date().toISOString();
 
     await saveStudyBundle(bundle);
     await setMetaValue('lastSuccessfulSyncAt', syncedAt);
+    await setMetaValue('lastSyncStatus', 'synced');
+    dispatchSyncEvent({ source: 'sync-success', syncedAt });
     return true;
   } catch {
+    const failedAt = new Date().toISOString();
+    await setMetaValue('lastSyncFailedAt', failedAt);
+    await setMetaValue('lastSyncStatus', 'failed');
+    dispatchSyncEvent({ source: 'sync-failed', syncedAt: failedAt });
     return false;
   }
 }
@@ -45,6 +54,8 @@ export async function scheduleStudyBackgroundSync(registration?: ServiceWorkerRe
     try {
       await resolvedRegistration.sync.register(STUDY_SYNC_TAG);
       await setMetaValue('lastSyncRequestedAt', new Date().toISOString());
+      await setMetaValue('lastSyncStatus', 'syncing');
+      dispatchSyncEvent({ source: 'sync-requested', syncedAt: new Date().toISOString() });
       return true;
     } catch {
       return syncStudyLibraryInForeground();

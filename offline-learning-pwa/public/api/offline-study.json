@@ -1,0 +1,96 @@
+{
+  "seededAt": "2026-03-29T00:00:00.000Z",
+  "subjects": [
+    {
+      "id": "mathematics",
+      "name": "Mathematics",
+      "icon": "Calculator",
+      "description": "Algebra, geometry, and practical arithmetic for exams.",
+      "chapterCount": 1,
+      "totalMaterials": 2,
+      "estimatedOfflineSizeKb": 96,
+      "updatedAt": "2026-03-29T00:00:00.000Z"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "fractions",
+      "subjectId": "mathematics",
+      "title": "Fractions and Decimals",
+      "progress": 0,
+      "estimatedReadMinutes": 18,
+      "sortOrder": 1,
+      "hasTextbook": true,
+      "hasNotes": true,
+      "completed": false,
+      "updatedAt": "2026-03-29T00:00:00.000Z"
+    }
+  ],
+  "materials": [
+    {
+      "id": "fractions-textbook",
+      "subjectId": "mathematics",
+      "chapterId": "fractions",
+      "kind": "textbook",
+      "title": "Fractions and Decimals Textbook",
+      "summary": "Fractions represent parts of a whole and decimals are another representation.",
+      "blocks": [
+        "A fraction is written as a/b where a is the numerator and b is the denominator.",
+        "To compare fractions, convert to like denominators.",
+        "Decimals can be converted to fractions using place value."
+      ],
+      "highlights": [
+        "Fraction = numerator/denominator",
+        "Use LCM for addition and subtraction",
+        "Decimal and fraction forms are equivalent"
+      ],
+      "sortOrder": 1,
+      "updatedAt": "2026-03-29T00:00:00.000Z"
+    },
+    {
+      "id": "fractions-notes",
+      "subjectId": "mathematics",
+      "chapterId": "fractions",
+      "kind": "notes",
+      "title": "Fractions and Decimals Notes",
+      "summary": "Quick revision notes for chapter practice.",
+      "blocks": [
+        "Write the rule first.",
+        "Solve one example step by step.",
+        "Double-check denominator handling."
+      ],
+      "highlights": [
+        "Convert mixed numbers before operations",
+        "Keep denominators positive",
+        "Simplify the final answer"
+      ],
+      "sortOrder": 2,
+      "updatedAt": "2026-03-29T00:00:00.000Z"
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "quick-revision",
+      "subjectId": null,
+      "chapterId": null,
+      "title": "Offline Quick Revision Quiz",
+      "description": "A short offline quiz bundle.",
+      "durationMinutes": 8,
+      "updatedAt": "2026-03-29T00:00:00.000Z",
+      "questions": [
+        {
+          "id": "q1",
+          "question": "What is 3/4 as a decimal?",
+          "options": [
+            { "id": "a", "text": "0.25" },
+            { "id": "b", "text": "0.75" },
+            { "id": "c", "text": "1.25" },
+            { "id": "d", "text": "0.50" }
+          ],
+          "correctOptionId": "b",
+          "explanation": "3 divided by 4 equals 0.75."
+        }
+      ]
+    }
+  ]
+}

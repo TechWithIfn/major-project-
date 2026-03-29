@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { getIcon } from '../../lib/icons';
-import { Subject } from '../../types';
+import type { OfflineSubject } from '../../types';
 
 type SubjectCardProps = {
-  subject: Subject;
+  subject: OfflineSubject;
 };
 
 export function SubjectCard({ subject }: SubjectCardProps) {
@@ -20,6 +20,9 @@ export function SubjectCard({ subject }: SubjectCardProps) {
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{subject.description}</p>
           <p className="mt-3 text-xs font-medium uppercase tracking-wide text-teal-700 dark:text-teal-400">
             {subject.chapterCount} chapters
+          </p>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            {subject.totalMaterials} materials · {subject.estimatedOfflineSizeKb} KB offline
           </p>
         </div>
         <span className="rounded-xl bg-teal-100 p-3 text-teal-700 dark:bg-slate-800 dark:text-teal-400">

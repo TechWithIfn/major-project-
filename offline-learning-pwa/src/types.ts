@@ -61,6 +61,27 @@ export type OfflineStudyMaterial = {
   updatedAt: string;
 };
 
+export type OfflineBookmark = {
+  id: string;
+  chapterId: string;
+  subjectId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OfflineChatMessage = {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: string;
+};
+
+export type OfflineBookmarkedChapter = {
+  bookmark: OfflineBookmark;
+  chapter: OfflineChapter;
+  subject: OfflineSubject | null;
+};
+
 export type OfflineQuizQuestion = QuizQuestion & {
   explanation: string;
 };
@@ -127,6 +148,20 @@ export type ProgressDashboardSnapshot = {
   subjectSummaries: SubjectProgressSummary[];
 };
 
+export type DashboardActivityItem = {
+  id: string;
+  kind: 'bookmark' | 'quiz' | 'completion';
+  timestamp: string;
+  message: string;
+};
+
+export type DashboardSnapshot = {
+  totalSubjects: number;
+  completedChapters: number;
+  bookmarkedItems: number;
+  recentActivity: DashboardActivityItem[];
+};
+
 export type OfflineStudyBundle = {
   seededAt: string;
   subjects: OfflineSubject[];
@@ -142,4 +177,5 @@ export type OfflineChapterBundle = {
   textbook: OfflineStudyMaterial | null;
   notes: OfflineStudyMaterial | null;
   quiz: OfflineQuiz | null;
+  isBookmarked: boolean;
 };

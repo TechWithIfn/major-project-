@@ -1,7 +1,7 @@
 import { Chapter, NavItem, QuizQuestion, Subject } from '../types';
 
 export const sidebarItems: NavItem[] = [
-  { label: 'Dashboard', path: '/', icon: 'LayoutDashboard' },
+  { label: 'Dashboard', path: '/dashboard', icon: 'LayoutDashboard' },
   { label: 'Progress', path: '/progress', icon: 'ChartNoAxesCombined' },
   { label: 'AI Tutor Chat', path: '/ai-tutor', icon: 'Bot' },
   { label: 'Quiz Generator', path: '/quiz-generator', icon: 'Sparkles' },

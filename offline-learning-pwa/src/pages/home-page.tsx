@@ -1,15 +1,45 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { StatCard } from '../components/ui/stat-card';
-import { recentActivities } from '../data/app-data';
-import { useOfflineSubjects, useProgressDashboard } from '../hooks/use-offline-study';
-import { getBookmarks } from '../lib/storage';
+import { Loader2 } from 'lucide-react';
+import { DashboardOverview } from '../components/dashboard/dashboard-overview';
+import { useOfflineSyncStatus, useProgressDashboard } from '../hooks/use-offline-study';
+import { scheduleStudyBackgroundSync } from '../lib/offline-sync';
+
+function formatSyncTimestamp(value: string | null): string {
+  if (!value) {
+    return 'Not available yet';
+  }
+
+  const timestamp = new Date(value);
+  if (Number.isNaN(timestamp.getTime())) {
+    return 'Not available yet';
+  }
+
+  return timestamp.toLocaleString();
+}
 
 export function HomePage() {
-  const bookmarkCount = getBookmarks().length;
-  const { data: subjects } = useOfflineSubjects();
+  const [isSyncingNow, setIsSyncingNow] = useState(false);
+  const [manualSyncMessage, setManualSyncMessage] = useState<string | null>(null);
   const { data: dashboardData } = useProgressDashboard();
+  const { data: syncStatus } = useOfflineSyncStatus();
 
   const recentQuizAttempt = dashboardData.recentQuizResults[0];
+  const isSyncActionDisabled = isSyncingNow || syncStatus.status === 'syncing' || !syncStatus.isOnline;
+
+  const handleSyncNow = async () => {
+    if (isSyncActionDisabled) {
+      return;
+    }
+
+    setIsSyncingNow(true);
+    setManualSyncMessage(null);
+
+    const started = await scheduleStudyBackgroundSync();
+
+    setManualSyncMessage(started ? 'Sync request sent. Content will refresh shortly.' : 'Unable to start sync right now. Please try again.');
+    setIsSyncingNow(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -36,18 +66,75 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Subjects" value={String(subjects.length)} hint="Available offline" />
-        <StatCard title="Completion" value={`${dashboardData.completionRate}%`} hint={`${dashboardData.completedChapters}/${dashboardData.totalChapters} chapters`} />
-        <StatCard title="Bookmarks" value={String(bookmarkCount)} hint="Saved highlights" />
-        <StatCard
-          title="Latest Quiz"
-          value={recentQuizAttempt ? `${recentQuizAttempt.percentage}%` : 'No attempt'}
-          hint={recentQuizAttempt ? `${recentQuizAttempt.score}/${recentQuizAttempt.totalQuestions} score` : 'Take your first quiz'}
-        />
+      <DashboardOverview
+        latestQuizLabel={recentQuizAttempt ? `${recentQuizAttempt.percentage}%` : 'No attempt'}
+        latestQuizHint={recentQuizAttempt ? `${recentQuizAttempt.score}/${recentQuizAttempt.totalQuestions} score` : 'Take your first quiz'}
+      />
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold">Offline Sync Status</h3>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Live sync health and timestamps from Dexie meta values.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span
+              className={[
+                'rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide',
+                syncStatus.status === 'synced'
+                  ? 'bg-emerald-100 text-emerald-800'
+                  : syncStatus.status === 'failed'
+                    ? 'bg-rose-100 text-rose-800'
+                    : syncStatus.status === 'syncing'
+                      ? 'bg-amber-100 text-amber-800'
+                      : 'bg-slate-100 text-slate-700',
+              ].join(' ')}
+            >
+              {syncStatus.status}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                void handleSyncNow();
+              }}
+              disabled={isSyncActionDisabled}
+              className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSyncingNow ? <Loader2 size={14} className="animate-spin" /> : null}
+              {isSyncingNow ? 'Syncing...' : 'Sync now'}
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800">
+            <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Network</p>
+            <p className="mt-1 font-medium">{syncStatus.isOnline ? 'Online' : 'Offline'}</p>
+          </div>
+          <div className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800">
+            <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Last Successful Sync</p>
+            <p className="mt-1 font-medium">{formatSyncTimestamp(syncStatus.lastSuccessfulSyncAt)}</p>
+          </div>
+          <div className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800">
+            <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Last Sync Requested</p>
+            <p className="mt-1 font-medium">{formatSyncTimestamp(syncStatus.lastSyncRequestedAt)}</p>
+          </div>
+          <div className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800">
+            <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Last Content Refresh</p>
+            <p className="mt-1 font-medium">{formatSyncTimestamp(syncStatus.lastContentRefreshAt)}</p>
+          </div>
+        </div>
+
+        {syncStatus.lastSyncFailedAt ? (
+          <p className="mt-3 rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700">Last failed sync: {formatSyncTimestamp(syncStatus.lastSyncFailedAt)}</p>
+        ) : null}
+
+        {manualSyncMessage ? (
+          <p className="mt-3 rounded-xl bg-slate-100 px-3 py-2 text-sm text-slate-700 dark:bg-slate-800 dark:text-slate-300">{manualSyncMessage}</p>
+        ) : null}
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
+      <section className="grid gap-4">
         <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <h3 className="text-lg font-semibold">Quick Actions</h3>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -67,17 +154,6 @@ export function HomePage() {
               View Profile
             </Link>
           </div>
-        </article>
-
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <h3 className="text-lg font-semibold">Recent Activity</h3>
-          <ul className="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-300">
-            {recentActivities.map((activity) => (
-              <li key={activity} className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
-                {activity}
-              </li>
-            ))}
-          </ul>
         </article>
       </section>
     </div>

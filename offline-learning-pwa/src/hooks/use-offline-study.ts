@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { DependencyList } from 'react';
 import type {
+  DashboardSnapshot,
   ChapterProgress,
+  OfflineBookmarkedChapter,
   OfflineChapter,
   OfflineChapterBundle,
   OfflineQuiz,
@@ -13,21 +15,35 @@ import type {
 import {
   OFFLINE_STUDY_UPDATED_EVENT,
   getAllChapterProgress,
+  getBookmarkedChapters,
+  getBookmarkCount,
   getChapterProgressMap,
   getFeaturedQuiz,
   getLatestQuizResult,
   getOfflineChapterBundle,
+  getMetaValue,
+  markChapterCompleted,
   getQuizById,
   getRecentQuizResults,
   getSubjectById,
   getSubjects,
   getChaptersBySubject,
+  studyDatabase,
 } from '../lib/db';
 
 type OfflineLoadState<T> = {
   data: T;
   isLoading: boolean;
   error: string | null;
+};
+
+export type OfflineSyncStatus = {
+  status: 'idle' | 'syncing' | 'synced' | 'failed';
+  isOnline: boolean;
+  lastSuccessfulSyncAt: string | null;
+  lastSyncRequestedAt: string | null;
+  lastSyncFailedAt: string | null;
+  lastContentRefreshAt: string | null;
 };
 
 type SubjectChapterState = {
@@ -228,4 +244,176 @@ export function useProgressDashboard(): OfflineLoadState<ProgressDashboardSnapsh
     },
     []
   );
+}
+
+export function useOfflineBookmarks(): OfflineLoadState<OfflineBookmarkedChapter[]> {
+  return useOfflineLoader(() => getBookmarkedChapters(), [], []);
+}
+
+type OfflineAppOverview = {
+  subjects: number;
+  chapters: number;
+  content: number;
+  quizzes: number;
+  bookmarks: number;
+};
+
+export function useOfflineAppOverview(): OfflineLoadState<OfflineAppOverview> {
+  return useOfflineLoader(
+    async () => {
+      const [subjects, chapters, content, quizzes, bookmarks] = await Promise.all([
+        studyDatabase.subjects.count(),
+        studyDatabase.chapters.count(),
+        studyDatabase.content.count(),
+        studyDatabase.quizzes.count(),
+        getBookmarkCount(),
+      ]);
+
+      return { subjects, chapters, content, quizzes, bookmarks };
+    },
+    {
+      subjects: 0,
+      chapters: 0,
+      content: 0,
+      quizzes: 0,
+      bookmarks: 0,
+    },
+    []
+  );
+}
+
+export function useOfflineSyncStatus(): OfflineLoadState<OfflineSyncStatus> {
+  return useOfflineLoader(
+    async () => {
+      const [
+        lastSuccessfulSyncAt,
+        lastSyncRequestedAt,
+        lastSyncFailedAt,
+        lastContentRefreshAt,
+        lastSyncStatus,
+      ] = await Promise.all([
+        getMetaValue('lastSuccessfulSyncAt'),
+        getMetaValue('lastSyncRequestedAt'),
+        getMetaValue('lastSyncFailedAt'),
+        getMetaValue('lastContentRefreshAt'),
+        getMetaValue('lastSyncStatus'),
+      ]);
+
+      const normalizedStatus: OfflineSyncStatus['status'] =
+        lastSyncStatus === 'synced'
+          ? 'synced'
+          : lastSyncStatus === 'failed'
+            ? 'failed'
+            : lastSyncStatus === 'syncing'
+              ? 'syncing'
+              : 'idle';
+
+      return {
+        status: normalizedStatus,
+        isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
+        lastSuccessfulSyncAt,
+        lastSyncRequestedAt,
+        lastSyncFailedAt,
+        lastContentRefreshAt,
+      };
+    },
+    {
+      status: 'idle',
+      isOnline: true,
+      lastSuccessfulSyncAt: null,
+      lastSyncRequestedAt: null,
+      lastSyncFailedAt: null,
+      lastContentRefreshAt: null,
+    },
+    []
+  );
+}
+
+export function useDashboardSnapshot(): OfflineLoadState<DashboardSnapshot> {
+  return useOfflineLoader(
+    async () => {
+      const [subjects, chapters, progressRows, bookmarks, quizResults] = await Promise.all([
+        getSubjects(),
+        studyDatabase.chapters.toArray(),
+        getAllChapterProgress(),
+        getBookmarkedChapters(),
+        getRecentQuizResults(6),
+      ]);
+
+      const progressByChapter = new Map(progressRows.map((row) => [row.chapterId, row]));
+      const chapterMap = new Map(chapters.map((chapter) => [chapter.id, chapter]));
+
+      const completedChapters = chapters.reduce((count, chapter) => {
+        const progress = progressByChapter.get(chapter.id);
+        return count + (progress?.completed ?? chapter.completed ? 1 : 0);
+      }, 0);
+
+      const bookmarkActivities = bookmarks.map((entry) => ({
+        id: `bookmark:${entry.bookmark.id}:${entry.bookmark.updatedAt}`,
+        kind: 'bookmark' as const,
+        timestamp: entry.bookmark.updatedAt,
+        message: `Bookmarked "${entry.chapter.title}" in ${entry.subject?.name ?? 'offline subject'}`,
+      }));
+
+      const quizActivities = quizResults.map((result) => ({
+        id: `quiz:${result.id}`,
+        kind: 'quiz' as const,
+        timestamp: result.completedAt,
+        message: `Completed ${result.quizId} with ${result.percentage}% score`,
+      }));
+
+      const completionActivities = progressRows
+        .filter((row) => row.completed)
+        .map((row) => ({
+          id: `complete:${row.id}:${row.updatedAt}`,
+          kind: 'completion' as const,
+          timestamp: row.updatedAt,
+          message: `Completed chapter "${chapterMap.get(row.chapterId)?.title ?? row.chapterId}"`,
+        }));
+
+      const recentActivity = [...bookmarkActivities, ...quizActivities, ...completionActivities]
+        .sort((left, right) => new Date(right.timestamp).getTime() - new Date(left.timestamp).getTime())
+        .slice(0, 8);
+
+      return {
+        totalSubjects: subjects.length,
+        completedChapters,
+        bookmarkedItems: bookmarks.length,
+        recentActivity,
+      };
+    },
+    {
+      totalSubjects: 0,
+      completedChapters: 0,
+      bookmarkedItems: 0,
+      recentActivity: [],
+    },
+    []
+  );
+}
+
+export function useProgressTracker() {
+  const [updatingChapterId, setUpdatingChapterId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const setChapterCompleted = async (chapterId: string, completed: boolean) => {
+    setUpdatingChapterId(chapterId);
+    setError(null);
+
+    try {
+      await markChapterCompleted(chapterId, completed);
+      return true;
+    } catch (updateError) {
+      setError(getErrorMessage(updateError));
+      return false;
+    } finally {
+      setUpdatingChapterId(null);
+    }
+  };
+
+  return {
+    updatingChapterId,
+    error,
+    setChapterCompleted,
+  };
 }

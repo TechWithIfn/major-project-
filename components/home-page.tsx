@@ -17,7 +17,6 @@ import { Footer } from '@/components/footer'
 import { Navbar } from '@/components/navbar'
 import { BookMarked, Lightbulb, Users, Brain, MessageSquare, Zap, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import { CURRICULUM_DATA } from '@/lib/curriculum'
 
 interface HomePageProps {
   onStartChat?: (classNum: number, subject: string) => void
@@ -211,12 +210,8 @@ export function HomePage({ onStartChat }: HomePageProps) {
               </DialogDescription>
             </DialogHeader>
             <TopicSelector
-              onSelectTopic={(topicId) => {
-                // Parse class and subject from topic selection
-                const topic = CURRICULUM_DATA.find((t: any) => t.id === topicId)
-                if (topic) {
-                  handleSelectTopic(topic.class, topic.subject)
-                }
+              onSelectTopic={(topic) => {
+                handleSelectTopic(topic.class, topic.subject)
               }}
               onClose={() => setShowTopicDialog(false)}
             />

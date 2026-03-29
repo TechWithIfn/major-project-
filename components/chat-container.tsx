@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import type { Message } from '@/lib/curriculum'
+import { NCERT_CLASSES, NCERT_SUBJECTS, type Message } from '@/lib/curriculum'
 import { ChatTopBar } from '@/components/chat-top-bar'
 import { ChatInputArea } from '@/components/chat-input-area'
 import { AssistantAnswerBubble } from '@/components/assistant-answer-bubble'
@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { addBookmark } from '@/lib/student/storage'
+import { loadStudyMaterials } from '@/lib/student/study-materials-db'
 import { Loader2, MessageSquare, History, Trash2, BookOpenText, BookmarkPlus, FileDown } from 'lucide-react'
 
 const GREETING_MESSAGE: Message = {
@@ -50,6 +51,9 @@ export function ChatContainer({ initialClass, initialSubject, onBack }: ChatCont
   const [selectedClass, setSelectedClass] = useState<number | null>(initialClass ?? null)
   const [selectedSubject, setSelectedSubject] = useState<string | null>(initialSubject ?? null)
   const [difficulty, setDifficulty] = useState<'easy' | 'standard' | 'exam'>('standard')
+  const [availableClasses, setAvailableClasses] = useState<number[]>([...NCERT_CLASSES])
+  const [availableSubjects, setAvailableSubjects] = useState<string[]>([...NCERT_SUBJECTS])
+  const [offlineCacheStatus, setOfflineCacheStatus] = useState<'loading' | 'ready' | 'fallback'>('loading')
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([])
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [recentOpen, setRecentOpen] = useState(false)
@@ -64,6 +68,46 @@ export function ChatContainer({ initialClass, initialSubject, onBack }: ChatCont
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  useEffect(() => {
+    let mounted = true
+
+    const hydrateTopicOptions = async () => {
+      const { materials, source } = await loadStudyMaterials()
+      if (!mounted) return
+
+      const classes = [...new Set(materials.map((topic) => topic.class))].sort((a, b) => a - b)
+      const subjects = [...new Set(materials.map((topic) => topic.subject))].sort((a, b) => a.localeCompare(b))
+
+      if (classes.length > 0) {
+        setAvailableClasses(classes)
+      }
+
+      if (subjects.length > 0) {
+        setAvailableSubjects(subjects)
+      }
+
+      setOfflineCacheStatus(source === 'memory-fallback' ? 'fallback' : 'ready')
+    }
+
+    void hydrateTopicOptions()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (selectedClass != null && !availableClasses.includes(selectedClass)) {
+      setSelectedClass(null)
+    }
+  }, [availableClasses, selectedClass])
+
+  useEffect(() => {
+    if (selectedSubject != null && !availableSubjects.includes(selectedSubject)) {
+      setSelectedSubject(null)
+    }
+  }, [availableSubjects, selectedSubject])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -290,6 +334,9 @@ export function ChatContainer({ initialClass, initialSubject, onBack }: ChatCont
   return (
     <div className="flex h-full min-h-0 flex-col bg-background">
       <ChatTopBar
+        classes={availableClasses}
+        subjects={availableSubjects}
+        offlineCacheStatus={offlineCacheStatus}
         selectedClass={selectedClass}
         selectedSubject={selectedSubject}
         onClassChange={setSelectedClass}
