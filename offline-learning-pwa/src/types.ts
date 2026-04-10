@@ -164,10 +164,25 @@ export type DashboardSnapshot = {
 
 export type OfflineStudyBundle = {
   seededAt: string;
+  version?: string;
   subjects: OfflineSubject[];
   chapters: OfflineChapter[];
   materials: OfflineStudyMaterial[];
   quizzes: OfflineQuiz[];
+};
+
+export type ContentUpdateManifest = {
+  version: string;
+  bundleUrl: string;
+  updatedAt: string;
+  notes?: string;
+};
+
+export type ContentUpdateCheckResult = {
+  hasUpdate: boolean;
+  currentVersion: string | null;
+  latestVersion: string;
+  manifest: ContentUpdateManifest;
 };
 
 export type OfflineChapterBundle = {

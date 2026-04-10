@@ -1,9 +1,11 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AiChatPanel } from '../components/chat/ai-chat-panel';
 import { StudentProfilePanel } from '../components/profile/student-profile-panel';
 import { QuizGeneratorPanel } from '../components/quiz/quiz-generator-panel';
 import { ChapterSummaryPanel } from '../components/summary/chapter-summary-panel';
-import { useOfflineAppOverview, useOfflineBookmarks, useOfflineSubjects, useProgressDashboard } from '../hooks/use-offline-study';
+import { useSavedBookmarks } from '../hooks/use-bookmarks';
+import { useOfflineAppOverview, useOfflineSubjects, useProgressDashboard } from '../hooks/use-offline-study';
 import { removeBookmark } from '../lib/db';
 
 function PageShell({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
@@ -68,7 +70,54 @@ export function SummaryModePage() {
 }
 
 export function SavedBookmarksPage() {
-  const { data: bookmarks, isLoading } = useOfflineBookmarks();
+  const { data: bookmarks, isLoading } = useSavedBookmarks();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [subjectFilter, setSubjectFilter] = useState('all');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!toastMessage) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setToastMessage(null);
+    }, 2200);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [toastMessage]);
+
+  const subjectOptions = useMemo(() => {
+    const uniqueSubjects = new Map<string, string>();
+    for (const entry of bookmarks) {
+      uniqueSubjects.set(entry.chapter.subjectId, entry.subject?.name ?? 'Offline subject');
+    }
+
+    return [...uniqueSubjects.entries()]
+      .map(([id, name]) => ({ id, name }))
+      .sort((left, right) => left.name.localeCompare(right.name));
+  }, [bookmarks]);
+
+  const filteredBookmarks = useMemo(() => {
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+
+    return bookmarks.filter((entry) => {
+      const matchesSubject = subjectFilter === 'all' || entry.chapter.subjectId === subjectFilter;
+      if (!matchesSubject) {
+        return false;
+      }
+
+      if (!normalizedSearch) {
+        return true;
+      }
+
+      const chapterTitle = entry.chapter.title.toLowerCase();
+      const subjectName = (entry.subject?.name ?? 'offline subject').toLowerCase();
+      return chapterTitle.includes(normalizedSearch) || subjectName.includes(normalizedSearch);
+    });
+  }, [bookmarks, searchQuery, subjectFilter]);
 
   return (
     <PageShell title="Saved Bookmarks" description="All bookmarks are loaded from IndexedDB and linked to chapters.">
@@ -77,8 +126,38 @@ export function SavedBookmarksPage() {
         <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">No bookmarks yet. Open any chapter and tap Add Bookmark.</p>
       ) : null}
 
+      {!isLoading && bookmarks.length > 0 ? (
+        <div className="mb-4 grid gap-2 sm:grid-cols-[1fr_auto]">
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search by chapter or subject"
+            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-teal-300 focus:ring dark:border-slate-700 dark:bg-slate-900"
+          />
+          <select
+            value={subjectFilter}
+            onChange={(event) => setSubjectFilter(event.target.value)}
+            className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-teal-300 focus:ring dark:border-slate-700 dark:bg-slate-900"
+          >
+            <option value="all">All subjects</option>
+            {subjectOptions.map((subjectOption) => (
+              <option key={subjectOption.id} value={subjectOption.id}>
+                {subjectOption.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
+
+      {!isLoading && bookmarks.length > 0 && filteredBookmarks.length === 0 ? (
+        <p className="mb-3 rounded-xl bg-slate-100 p-3 text-sm text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+          No bookmarks match your search or filter.
+        </p>
+      ) : null}
+
       <div className="space-y-2">
-        {bookmarks.map((entry) => (
+        {filteredBookmarks.map((entry) => (
           <div key={entry.bookmark.id} className="rounded-xl border border-slate-200 p-3 dark:border-slate-700">
             <Link
               to={`/subjects/${entry.chapter.subjectId}/chapters/${entry.chapter.id}/read`}
@@ -90,7 +169,9 @@ export function SavedBookmarksPage() {
             <button
               type="button"
               onClick={() => {
-                void removeBookmark(entry.chapter.id);
+                void removeBookmark(entry.chapter.id).then(() => {
+                  setToastMessage('Bookmark removed.');
+                });
               }}
               className="mt-2 rounded-lg border border-rose-200 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-50"
             >
@@ -99,6 +180,11 @@ export function SavedBookmarksPage() {
           </div>
         ))}
       </div>
+      {toastMessage ? (
+        <div className="pointer-events-none fixed bottom-5 right-5 z-50 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white shadow-lg dark:bg-slate-100 dark:text-slate-900">
+          {toastMessage}
+        </div>
+      ) : null}
     </PageShell>
   );
 }

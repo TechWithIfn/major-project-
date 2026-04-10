@@ -166,6 +166,7 @@ async function getCompletionMap(): Promise<Map<string, ChapterProgress>> {
 
 export async function saveStudyBundle(bundle: OfflineStudyBundle): Promise<void> {
   const completionMap = await getCompletionMap();
+  const contentVersion = bundle.version ?? bundle.seededAt;
   const mergedChapters = bundle.chapters.map((chapter) => ({
     ...chapter,
     completed: completionMap.get(chapter.id)?.completed ?? chapter.completed,
@@ -189,6 +190,11 @@ export async function saveStudyBundle(bundle: OfflineStudyBundle): Promise<void>
         key: 'seededAt',
         value: bundle.seededAt,
         updatedAt: bundle.seededAt,
+      });
+      await studyDatabase.meta.put({
+        key: 'contentVersion',
+        value: contentVersion,
+        updatedAt: getTimestamp(),
       });
       await studyDatabase.meta.put({
         key: 'lastContentRefreshAt',
@@ -429,9 +435,20 @@ export async function removeBookmark(chapterId: string): Promise<void> {
   emitOfflineStudyUpdated({ source: 'bookmark-remove', chapterId });
 }
 
-export async function clearBookmarks(): Promise<void> {
+export async function clearBookmarks(chapterId?: string): Promise<void> {
+  if (chapterId) {
+    await studyDatabase.bookmarks.delete(chapterId);
+    emitOfflineStudyUpdated({ source: 'bookmark-clear', chapterId });
+    return;
+  }
+
   await studyDatabase.bookmarks.clear();
   emitOfflineStudyUpdated({ source: 'bookmark-clear' });
+}
+
+// Compatibility alias for callers still using clearMarks.
+export async function clearMarks(chapterId?: string): Promise<void> {
+  await clearBookmarks(chapterId);
 }
 
 export async function clearOfflineContentData(): Promise<void> {

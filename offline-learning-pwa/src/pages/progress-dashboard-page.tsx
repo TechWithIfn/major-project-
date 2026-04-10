@@ -37,6 +37,9 @@ export function ProgressDashboardPage() {
         <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <p className="text-sm text-slate-500 dark:text-slate-400">Completion Rate</p>
           <p className="mt-1 text-2xl font-bold">{data.completionRate}%</p>
+          <div className="mt-2">
+            <ProgressBar value={data.completionRate} />
+          </div>
         </article>
         <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <p className="text-sm text-slate-500 dark:text-slate-400">Quiz Attempts</p>

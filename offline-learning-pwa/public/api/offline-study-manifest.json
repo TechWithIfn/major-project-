@@ -1,0 +1,6 @@
+{
+  "version": "2026.04.10",
+  "bundleUrl": "/api/offline-study.json",
+  "updatedAt": "2026-04-10T00:00:00.000Z",
+  "notes": "Initial manifest for version-based offline content updates."
+}

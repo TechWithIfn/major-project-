@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { DependencyList } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import type {
   DashboardSnapshot,
   ChapterProgress,
@@ -13,7 +13,6 @@ import type {
   SubjectProgressSummary,
 } from '../types';
 import {
-  OFFLINE_STUDY_UPDATED_EVENT,
   getAllChapterProgress,
   getBookmarkedChapters,
   getBookmarkCount,
@@ -52,70 +51,18 @@ type SubjectChapterState = {
   progressByChapter: Record<string, ChapterProgress>;
 };
 
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Failed to load offline study data.';
-}
-
-function useOfflineLoader<T>(loader: () => Promise<T>, initialValue: T, dependencies: DependencyList): OfflineLoadState<T> {
-  const [data, setData] = useState<T>(initialValue);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [refreshToken, setRefreshToken] = useState(0);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return undefined;
-    }
-
-    const handleRefresh = () => {
-      setRefreshToken((current) => current + 1);
-    };
-
-    window.addEventListener(OFFLINE_STUDY_UPDATED_EVENT, handleRefresh as EventListener);
-
-    return () => {
-      window.removeEventListener(OFFLINE_STUDY_UPDATED_EVENT, handleRefresh as EventListener);
-    };
-  }, []);
-
-  useEffect(() => {
-    let isActive = true;
-
-    setIsLoading(true);
-    setError(null);
-    setData(initialValue);
-
-    loader()
-      .then((nextValue) => {
-        if (isActive) {
-          setData(nextValue);
-        }
-      })
-      .catch((loadError) => {
-        if (isActive) {
-          setError(getErrorMessage(loadError));
-        }
-      })
-      .finally(() => {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      isActive = false;
-    };
-  }, [refreshToken, ...dependencies]);
-
-  return { data, isLoading, error };
-}
-
 export function useOfflineSubjects(): OfflineLoadState<OfflineSubject[]> {
-  return useOfflineLoader(() => getSubjects(), [], []);
+  const data = useLiveQuery(async () => getSubjects(), []);
+
+  return {
+    data: data ?? [],
+    isLoading: data === undefined,
+    error: null,
+  };
 }
 
 export function useOfflineSubjectChapters(subjectId?: string): OfflineLoadState<SubjectChapterState> {
-  return useOfflineLoader(
+  const data = useLiveQuery(
     async () => {
       if (!subjectId) {
         return { subject: null, chapters: [], progressByChapter: {} };
@@ -130,13 +77,18 @@ export function useOfflineSubjectChapters(subjectId?: string): OfflineLoadState<
         progressByChapter,
       };
     },
-    { subject: null, chapters: [], progressByChapter: {} },
     [subjectId]
   );
+
+  return {
+    data: data ?? { subject: null, chapters: [], progressByChapter: {} },
+    isLoading: data === undefined,
+    error: null,
+  };
 }
 
 export function useOfflineChapterBundle(chapterId?: string): OfflineLoadState<OfflineChapterBundle | null> {
-  return useOfflineLoader(
+  const data = useLiveQuery(
     async () => {
       if (!chapterId) {
         return null;
@@ -144,13 +96,18 @@ export function useOfflineChapterBundle(chapterId?: string): OfflineLoadState<Of
 
       return getOfflineChapterBundle(chapterId);
     },
-    null,
     [chapterId]
   );
+
+  return {
+    data: data ?? null,
+    isLoading: data === undefined,
+    error: null,
+  };
 }
 
 export function useOfflineQuiz(quizId?: string): OfflineLoadState<OfflineQuiz | null> {
-  return useOfflineLoader(
+  const data = useLiveQuery(
     async () => {
       if (quizId) {
         return getQuizById(quizId);
@@ -158,13 +115,18 @@ export function useOfflineQuiz(quizId?: string): OfflineLoadState<OfflineQuiz | 
 
       return getFeaturedQuiz();
     },
-    null,
     [quizId]
   );
+
+  return {
+    data: data ?? null,
+    isLoading: data === undefined,
+    error: null,
+  };
 }
 
 export function useLatestQuizResult(quizId?: string): OfflineLoadState<QuizResultRecord | null> {
-  return useOfflineLoader(
+  const data = useLiveQuery(
     async () => {
       if (!quizId) {
         return null;
@@ -172,13 +134,18 @@ export function useLatestQuizResult(quizId?: string): OfflineLoadState<QuizResul
 
       return getLatestQuizResult(quizId);
     },
-    null,
     [quizId]
   );
+
+  return {
+    data: data ?? null,
+    isLoading: data === undefined,
+    error: null,
+  };
 }
 
 export function useProgressDashboard(): OfflineLoadState<ProgressDashboardSnapshot> {
-  return useOfflineLoader(
+  const data = useLiveQuery(
     async () => {
       const [subjects, chapterProgressRows, recentQuizResults] = await Promise.all([
         getSubjects(),
@@ -234,7 +201,11 @@ export function useProgressDashboard(): OfflineLoadState<ProgressDashboardSnapsh
         subjectSummaries,
       };
     },
-    {
+    []
+  );
+
+  return {
+    data: data ?? {
       totalSubjects: 0,
       totalChapters: 0,
       completedChapters: 0,
@@ -242,12 +213,19 @@ export function useProgressDashboard(): OfflineLoadState<ProgressDashboardSnapsh
       recentQuizResults: [],
       subjectSummaries: [],
     },
-    []
-  );
+    isLoading: data === undefined,
+    error: null,
+  };
 }
 
 export function useOfflineBookmarks(): OfflineLoadState<OfflineBookmarkedChapter[]> {
-  return useOfflineLoader(() => getBookmarkedChapters(), [], []);
+  const data = useLiveQuery(async () => getBookmarkedChapters(), []);
+
+  return {
+    data: data ?? [],
+    isLoading: data === undefined,
+    error: null,
+  };
 }
 
 type OfflineAppOverview = {
@@ -259,7 +237,7 @@ type OfflineAppOverview = {
 };
 
 export function useOfflineAppOverview(): OfflineLoadState<OfflineAppOverview> {
-  return useOfflineLoader(
+  const data = useLiveQuery(
     async () => {
       const [subjects, chapters, content, quizzes, bookmarks] = await Promise.all([
         studyDatabase.subjects.count(),
@@ -271,19 +249,43 @@ export function useOfflineAppOverview(): OfflineLoadState<OfflineAppOverview> {
 
       return { subjects, chapters, content, quizzes, bookmarks };
     },
-    {
+    []
+  );
+
+  return {
+    data: data ?? {
       subjects: 0,
       chapters: 0,
       content: 0,
       quizzes: 0,
       bookmarks: 0,
     },
-    []
-  );
+    isLoading: data === undefined,
+    error: null,
+  };
 }
 
 export function useOfflineSyncStatus(): OfflineLoadState<OfflineSyncStatus> {
-  return useOfflineLoader(
+  const [isOnline, setIsOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true));
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  const data = useLiveQuery(
     async () => {
       const [
         lastSuccessfulSyncAt,
@@ -310,27 +312,32 @@ export function useOfflineSyncStatus(): OfflineLoadState<OfflineSyncStatus> {
 
       return {
         status: normalizedStatus,
-        isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
+        isOnline,
         lastSuccessfulSyncAt,
         lastSyncRequestedAt,
         lastSyncFailedAt,
         lastContentRefreshAt,
       };
     },
-    {
+    [isOnline]
+  );
+
+  return {
+    data: data ?? {
       status: 'idle',
-      isOnline: true,
+      isOnline,
       lastSuccessfulSyncAt: null,
       lastSyncRequestedAt: null,
       lastSyncFailedAt: null,
       lastContentRefreshAt: null,
     },
-    []
-  );
+    isLoading: data === undefined,
+    error: null,
+  };
 }
 
 export function useDashboardSnapshot(): OfflineLoadState<DashboardSnapshot> {
-  return useOfflineLoader(
+  const data = useLiveQuery(
     async () => {
       const [subjects, chapters, progressRows, bookmarks, quizResults] = await Promise.all([
         getSubjects(),
@@ -382,14 +389,19 @@ export function useDashboardSnapshot(): OfflineLoadState<DashboardSnapshot> {
         recentActivity,
       };
     },
-    {
+    []
+  );
+
+  return {
+    data: data ?? {
       totalSubjects: 0,
       completedChapters: 0,
       bookmarkedItems: 0,
       recentActivity: [],
     },
-    []
-  );
+    isLoading: data === undefined,
+    error: null,
+  };
 }
 
 export function useProgressTracker() {
@@ -404,7 +416,7 @@ export function useProgressTracker() {
       await markChapterCompleted(chapterId, completed);
       return true;
     } catch (updateError) {
-      setError(getErrorMessage(updateError));
+      setError(updateError instanceof Error ? updateError.message : 'Failed to load offline study data.');
       return false;
     } finally {
       setUpdatingChapterId(null);

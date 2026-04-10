@@ -1,5 +1,6 @@
-import { OFFLINE_STUDY_UPDATED_EVENT, saveStudyBundle, setMetaValue } from './db';
-import { fetchStudyBundleFromApi } from './sync-api';
+import { OFFLINE_STUDY_UPDATED_EVENT, getMetaValue, saveStudyBundle, setMetaValue } from './db';
+import { checkContentUpdate, downloadStudyBundleByUrl, fetchStudyBundleFromApi } from './sync-api';
+import type { ContentUpdateCheckResult } from '../types';
 
 export const STUDY_SYNC_TAG = 'learning-hub-study-sync';
 
@@ -26,7 +27,30 @@ export async function syncStudyLibraryInForeground(): Promise<boolean> {
     await setMetaValue('lastSyncStatus', 'syncing');
     dispatchSyncEvent({ source: 'sync-started', syncedAt: new Date().toISOString() });
 
-    const bundle = await fetchStudyBundleFromApi();
+    const currentVersion = await getMetaValue('contentVersion');
+    const updateCheck = await checkContentUpdate(currentVersion).catch(() => null);
+
+    if (updateCheck && !updateCheck.hasUpdate) {
+      const syncedAt = new Date().toISOString();
+      await setMetaValue('lastSuccessfulSyncAt', syncedAt);
+      await setMetaValue('lastSyncStatus', 'synced');
+      dispatchSyncEvent({
+        source: 'sync-no-update',
+        syncedAt,
+        currentVersion: updateCheck.currentVersion,
+        latestVersion: updateCheck.latestVersion,
+      });
+      return true;
+    }
+
+    const bundle = updateCheck
+      ? await downloadStudyBundleByUrl(updateCheck.manifest.bundleUrl)
+      : await fetchStudyBundleFromApi();
+
+    if (updateCheck && !bundle.version) {
+      bundle.version = updateCheck.latestVersion;
+    }
+
     const syncedAt = new Date().toISOString();
 
     await saveStudyBundle(bundle);
@@ -92,4 +116,13 @@ export function initializeOfflineStudySync(): void {
       void scheduleStudyBackgroundSync();
     }
   });
+}
+
+export async function checkForStudyContentUpdate(): Promise<ContentUpdateCheckResult | null> {
+  if (typeof window === 'undefined' || !navigator.onLine) {
+    return null;
+  }
+
+  const currentVersion = await getMetaValue('contentVersion');
+  return checkContentUpdate(currentVersion);
 }

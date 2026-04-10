@@ -5,6 +5,7 @@ const IMAGE_CACHE_NAME = 'offline-learning-images-v1';
 const STUDY_CACHE_NAME = 'offline-learning-study-v1';
 const SYNC_CACHE_NAME = 'offline-learning-sync-cache-v1';
 const APP_SHELL_FILES = ['/', '/index.html', '/manifest.json', '/offline.html', '/icons/icon-192.png', '/icons/icon-512.png'];
+const APP_ROUTES = ['/dashboard', '/subjects', '/quiz', '/progress', '/settings', '/bookmarks', '/ai-tutor', '/quiz-generator', '/summary-mode', '/profile'];
 const STUDY_SYNC_TAG = 'learning-hub-study-sync';
 const STUDY_SYNC_URLS = ['/api/offline-study.json', '/api/offline-study', 'http://localhost:3000/api/offline-study'];
 const DB_NAME = 'learning-hub-offline-db';
@@ -320,9 +321,34 @@ async function syncStudyLibraryInBackground() {
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(APP_SHELL_FILES);
-    })
+    (async () => {
+      const shellCache = await caches.open(CACHE_NAME);
+
+      // Cache core shell files first and continue even if a non-critical file fails.
+      await Promise.all(
+        APP_SHELL_FILES.map(async (url) => {
+          try {
+            await shellCache.add(url);
+          } catch {
+            // Keep install resilient; runtime/network-first handles misses.
+          }
+        })
+      );
+
+      // Warm route cache with the app shell so deep links work offline.
+      const htmlCache = await caches.open(HTML_CACHE_NAME);
+      const appShellResponse = await shellCache.match('/index.html');
+
+      if (!appShellResponse) {
+        return;
+      }
+
+      await Promise.all(
+        APP_ROUTES.map(async (routePath) => {
+          await htmlCache.put(routePath, appShellResponse.clone());
+        })
+      );
+    })()
   );
 
   self.skipWaiting();

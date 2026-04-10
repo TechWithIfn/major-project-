@@ -39,6 +39,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <LazyRoute><HomePage /></LazyRoute> },
       { path: 'subjects', element: <LazyRoute><SubjectsPage /></LazyRoute> },
+      { path: 'subjects/:subjectId', element: <Navigate to="chapters" relative="path" replace /> },
       { path: 'subjects/:subjectId/chapters', element: <LazyRoute><ChaptersPage /></LazyRoute> },
       { path: 'subjects/:subjectId/chapters/:chapterId/read', element: <LazyRoute><ReaderPage /></LazyRoute> },
       { path: 'quiz', element: <LazyRoute><QuizPage /></LazyRoute> },

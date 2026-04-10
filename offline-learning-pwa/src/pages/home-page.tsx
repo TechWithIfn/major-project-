@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import { DashboardOverview } from '../components/dashboard/dashboard-overview';
-import { useOfflineSyncStatus, useProgressDashboard } from '../hooks/use-offline-study';
-import { scheduleStudyBackgroundSync } from '../lib/offline-sync';
+import { RealDataDashboard } from '../components/dashboard/real-data-dashboard';
+import { useOfflineSyncStatus } from '../hooks/use-offline-study';
+import { checkForStudyContentUpdate, scheduleStudyBackgroundSync } from '../lib/offline-sync';
 
 function formatSyncTimestamp(value: string | null): string {
   if (!value) {
@@ -20,12 +20,51 @@ function formatSyncTimestamp(value: string | null): string {
 
 export function HomePage() {
   const [isSyncingNow, setIsSyncingNow] = useState(false);
+  const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
+  const [hasContentUpdate, setHasContentUpdate] = useState<boolean | null>(null);
+  const [latestContentVersion, setLatestContentVersion] = useState<string | null>(null);
   const [manualSyncMessage, setManualSyncMessage] = useState<string | null>(null);
-  const { data: dashboardData } = useProgressDashboard();
   const { data: syncStatus } = useOfflineSyncStatus();
 
-  const recentQuizAttempt = dashboardData.recentQuizResults[0];
   const isSyncActionDisabled = isSyncingNow || syncStatus.status === 'syncing' || !syncStatus.isOnline;
+
+  useEffect(() => {
+    if (!syncStatus.isOnline) {
+      setHasContentUpdate(null);
+      setLatestContentVersion(null);
+      return;
+    }
+
+    let isActive = true;
+    setIsCheckingUpdates(true);
+
+    checkForStudyContentUpdate()
+      .then((result) => {
+        if (!isActive) {
+          return;
+        }
+
+        setHasContentUpdate(result?.hasUpdate ?? null);
+        setLatestContentVersion(result?.latestVersion ?? null);
+      })
+      .catch(() => {
+        if (!isActive) {
+          return;
+        }
+
+        setHasContentUpdate(null);
+        setLatestContentVersion(null);
+      })
+      .finally(() => {
+        if (isActive) {
+          setIsCheckingUpdates(false);
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [syncStatus.isOnline]);
 
   const handleSyncNow = async () => {
     if (isSyncActionDisabled) {
@@ -34,6 +73,21 @@ export function HomePage() {
 
     setIsSyncingNow(true);
     setManualSyncMessage(null);
+
+    const updateCheck = await checkForStudyContentUpdate().catch(() => null);
+
+    if (updateCheck && !updateCheck.hasUpdate) {
+      setHasContentUpdate(false);
+      setLatestContentVersion(updateCheck.latestVersion);
+      setManualSyncMessage('Content is already up to date.');
+      setIsSyncingNow(false);
+      return;
+    }
+
+    if (updateCheck) {
+      setHasContentUpdate(updateCheck.hasUpdate);
+      setLatestContentVersion(updateCheck.latestVersion);
+    }
 
     const started = await scheduleStudyBackgroundSync();
 
@@ -66,10 +120,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <DashboardOverview
-        latestQuizLabel={recentQuizAttempt ? `${recentQuizAttempt.percentage}%` : 'No attempt'}
-        latestQuizHint={recentQuizAttempt ? `${recentQuizAttempt.score}/${recentQuizAttempt.totalQuestions} score` : 'Take your first quiz'}
-      />
+      <RealDataDashboard />
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -78,6 +129,11 @@ export function HomePage() {
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Live sync health and timestamps from Dexie meta values.</p>
           </div>
           <div className="flex items-center gap-2">
+            {hasContentUpdate ? (
+              <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-800">
+                Update available
+              </span>
+            ) : null}
             <span
               className={[
                 'rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide',
@@ -101,10 +157,18 @@ export function HomePage() {
               className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSyncingNow ? <Loader2 size={14} className="animate-spin" /> : null}
-              {isSyncingNow ? 'Syncing...' : 'Sync now'}
+              {isSyncingNow ? 'Syncing...' : hasContentUpdate ? 'Update content' : 'Sync now'}
             </button>
           </div>
         </div>
+
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+          {isCheckingUpdates
+            ? 'Checking for updates...'
+            : latestContentVersion
+              ? `Latest content version: ${latestContentVersion}`
+              : 'Update version info unavailable.'}
+        </p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800">

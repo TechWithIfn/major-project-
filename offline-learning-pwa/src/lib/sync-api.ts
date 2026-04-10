@@ -6,9 +6,12 @@ import type {
   OfflineStudyMaterial,
   OfflineSubject,
   QuizOption,
+  ContentUpdateCheckResult,
+  ContentUpdateManifest,
 } from '../types';
 
 export const STUDY_SYNC_URL = (import.meta.env.VITE_OFFLINE_STUDY_SYNC_URL || '/api/offline-study.json').trim();
+export const STUDY_MANIFEST_URL = (import.meta.env.VITE_OFFLINE_STUDY_MANIFEST_URL || '/api/offline-study-manifest.json').trim();
 
 function getCandidateSyncUrls(): string[] {
   const fromEnv = (import.meta.env.VITE_OFFLINE_STUDY_SYNC_URL || '').trim();
@@ -136,11 +139,20 @@ function normalizeQuiz(value: unknown): OfflineQuiz | null {
   };
 }
 
+function getCandidateManifestUrls(): string[] {
+  const fromEnv = (import.meta.env.VITE_OFFLINE_STUDY_MANIFEST_URL || '').trim();
+  const fallbackFromEnv = (import.meta.env.VITE_OFFLINE_STUDY_MANIFEST_FALLBACK_URL || '').trim();
+
+  return [fromEnv, fallbackFromEnv, '/api/offline-study-manifest.json', '/api/offline-study/manifest']
+    .filter((url, index, list): url is string => Boolean(url) && list.indexOf(url) === index);
+}
+
 export function normalizeStudyBundle(value: unknown): OfflineStudyBundle {
   const safeValue = isRecord(value) ? value : {};
 
   return {
     seededAt: toStringValue(safeValue.seededAt, new Date().toISOString()),
+    version: toStringValue(safeValue.version, toStringValue(safeValue.seededAt, new Date().toISOString())),
     subjects: Array.isArray(safeValue.subjects)
       ? safeValue.subjects.map(normalizeSubject).filter((subject): subject is OfflineSubject => subject !== null)
       : [],
@@ -153,6 +165,17 @@ export function normalizeStudyBundle(value: unknown): OfflineStudyBundle {
     quizzes: Array.isArray(safeValue.quizzes)
       ? safeValue.quizzes.map(normalizeQuiz).filter((quiz): quiz is OfflineQuiz => quiz !== null)
       : [],
+  };
+}
+
+function normalizeUpdateManifest(value: unknown): ContentUpdateManifest {
+  const safeValue = isRecord(value) ? value : {};
+
+  return {
+    version: toStringValue(safeValue.version, new Date().toISOString()),
+    bundleUrl: toStringValue(safeValue.bundleUrl, STUDY_SYNC_URL),
+    updatedAt: toStringValue(safeValue.updatedAt, new Date().toISOString()),
+    notes: toStringValue(safeValue.notes) || undefined,
   };
 }
 
@@ -184,4 +207,63 @@ export async function fetchStudyBundleFromApi(signal?: AbortSignal): Promise<Off
   }
 
   throw lastError instanceof Error ? lastError : new Error(`Study sync failed for all configured endpoints. Last tried URL: ${STUDY_SYNC_URL}`);
+}
+
+export async function fetchStudyUpdateManifest(signal?: AbortSignal): Promise<ContentUpdateManifest> {
+  const candidateUrls = getCandidateManifestUrls();
+  let lastError: unknown;
+
+  for (const url of candidateUrls) {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          Accept: 'application/json',
+        },
+        signal,
+      });
+
+      if (!response.ok) {
+        lastError = new Error(`Update manifest request failed with status ${response.status} for ${url}.`);
+        continue;
+      }
+
+      const payload = await response.json();
+      return normalizeUpdateManifest(payload);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error(`Update manifest fetch failed for all configured endpoints. Last tried URL: ${STUDY_MANIFEST_URL}`);
+}
+
+export async function downloadStudyBundleByUrl(bundleUrl: string, signal?: AbortSignal): Promise<OfflineStudyBundle> {
+  const response = await fetch(bundleUrl, {
+    method: 'GET',
+    cache: 'no-store',
+    headers: {
+      Accept: 'application/json',
+    },
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Study bundle download failed with status ${response.status} for ${bundleUrl}.`);
+  }
+
+  const payload = await response.json();
+  return normalizeStudyBundle(payload);
+}
+
+export async function checkContentUpdate(currentVersion: string | null, signal?: AbortSignal): Promise<ContentUpdateCheckResult> {
+  const manifest = await fetchStudyUpdateManifest(signal);
+
+  return {
+    hasUpdate: currentVersion !== manifest.version,
+    currentVersion,
+    latestVersion: manifest.version,
+    manifest,
+  };
 }

@@ -131,3 +131,9 @@ npm run preview
 - Lessons are seeded in IndexedDB for offline learning support.
 - UI preferences/bookmarks are stored locally for quick access.
 - Students can continue studying without internet after first load.
+
+## QA Smoke Checklist
+
+For release validation and regression checks, run the documented smoke plan:
+
+- [docs/QA_SMOKE_CHECKLIST.md](docs/QA_SMOKE_CHECKLIST.md)

@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useNetworkStatus } from '../hooks/use-network-status';
 import { useOfflineAppOverview, useOfflineBookmarks } from '../hooks/use-offline-study';
-import { clearOfflineContentData } from '../lib/db';
+import { clearOfflineContentData, primeOfflineStudyLibrary } from '../lib/db';
+import { offlineStudySeed } from '../data/offline-study-seed';
 
 type LayoutContext = {
   darkMode: boolean;
@@ -13,6 +15,8 @@ export function SettingsPage() {
   const { isOnline, changedAt } = useNetworkStatus();
   const { data: overview } = useOfflineAppOverview();
   const { data: bookmarks } = useOfflineBookmarks();
+  const [isSeeding, setIsSeeding] = useState(false);
+  const [seedMessage, setSeedMessage] = useState<string | null>(null);
 
   const handleClearCache = async () => {
     await clearOfflineContentData();
@@ -23,6 +27,22 @@ export function SettingsPage() {
     }
 
     window.location.reload();
+  };
+
+  const handleResetAndSeed = async () => {
+    setIsSeeding(true);
+    setSeedMessage(null);
+
+    try {
+      await clearOfflineContentData();
+      await primeOfflineStudyLibrary(offlineStudySeed);
+      setSeedMessage('Offline demo library has been reset and seeded successfully.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to seed offline demo library.';
+      setSeedMessage(message);
+    } finally {
+      setIsSeeding(false);
+    }
   };
 
   return (
@@ -63,13 +83,24 @@ export function SettingsPage() {
 
       <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <h3 className="font-semibold">Maintenance</h3>
-        <button
-          type="button"
-          onClick={handleClearCache}
-          className="mt-3 rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"
-        >
-          Clear Cache Data
-        </button>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleClearCache}
+            className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"
+          >
+            Clear Cache Data
+          </button>
+          <button
+            type="button"
+            onClick={handleResetAndSeed}
+            disabled={isSeeding}
+            className="rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isSeeding ? 'Seeding Offline Library...' : 'Reset and Seed Demo Library'}
+          </button>
+        </div>
+        {seedMessage ? <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">{seedMessage}</p> : null}
       </article>
 
       <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
